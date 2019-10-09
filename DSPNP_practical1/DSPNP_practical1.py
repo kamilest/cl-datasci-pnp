@@ -82,7 +82,7 @@ def drop_uncorrelated_features(housing, housing_labels, threshold=0.1, inplace=F
 housing = strat_train_set.drop("median_house_value", axis=1)
 housing_labels = strat_train_set["median_house_value"].copy()
 
-# housing = drop_uncorrelated_features(housing, housing_labels, threshold=0.05)
+# housing = drop_uncorrelated_features(housing, housing_labels)
 
 housing_num = housing.drop("ocean_proximity", axis=1)
 num_attribs = list(housing_num)
@@ -92,7 +92,7 @@ num_pipeline = Pipeline([
         ('selector', DataFrameSelector(num_attribs)),
         ('imputer', SimpleImputer(strategy="median")),
         ('attribs_adder', CombinedAttributesAdder()),
-        ('std_scaler', StandardScaler()),
+        ('std_scaler', MinMaxScaler()),
     ])
 
 cat_pipeline = Pipeline([
@@ -109,12 +109,16 @@ full_pipeline = FeatureUnion(transformer_list=[
 housing_prepared = full_pipeline.fit_transform(housing)
 print(housing_prepared.shape)
 
+metrics = {}
+
 # LINEAR REGRESSION
 lin_reg = LinearRegression()
 lin_reg.fit(housing_prepared, housing_labels)
 housing_predictions = lin_reg.predict(housing_prepared)
 lin_mse = mean_squared_error(housing_labels, housing_predictions)
 lin_rmse = np.sqrt(lin_mse)
+
+metrics["lin_rmse"] = lin_rmse
 print("lin_mrse on training set: {}".format(lin_rmse))
 
 
@@ -126,6 +130,8 @@ model = model.fit(housing_prepared, housing_labels)
 housing_predictions = model.predict(housing_prepared)
 lin_mse = mean_squared_error(housing_labels, housing_predictions)
 lin_rmse = np.sqrt(lin_mse)
+
+metrics["poly_rmse"] = lin_rmse
 print("lin_mrse on training set with polynomial features {}".format(lin_rmse))
 
 
@@ -135,6 +141,7 @@ tree_reg = tree_reg.fit(housing_prepared, housing_labels)
 housing_predictions = tree_reg.predict(housing_prepared)
 tree_mse = mean_squared_error(housing_labels, housing_predictions)
 tree_mse = np.sqrt(tree_mse)
+
 print("mrse on training set with decision tree regressor {}".format(tree_mse))
 
 
@@ -155,9 +162,12 @@ def analyse_cv(model):
     # print("Standard deviation:", sqrt_scores.std())
     return sqrt_scores.mean()
     
-print("cv mean on decision tree {}".format(analyse_cv(tree_reg)))
-print("cv mean on linear regression {}".format(analyse_cv(lin_reg)))
-print("cv mean on random forest {}".format(analyse_cv(forest_reg)))
+metrics["tree_cv"] = analyse_cv(tree_reg)
+metrics["lin_cv"] = analyse_cv(lin_reg)
+metrics["forest_cv"] = analyse_cv(forest_reg)
+print("cv mean on decision tree {}".format(metrics["tree_cv"]))
+print("cv mean on linear regression {}".format(metrics["lin_cv"]))
+print("cv mean on random forest {}".format(metrics["forest_cv"]))
 
 
 # GRID SEARCH ON RANDOM FOREST
@@ -185,4 +195,8 @@ X_test_prepared = full_pipeline.transform(X_test)
 final_predictions = final_model.predict(X_test_prepared)
 final_mse = mean_squared_error(y_test, final_predictions)
 final_rmse = np.sqrt(final_mse)
+
+metrics["final_rmse"] = final_rmse
 print("rmse on random forest grid search {}".format(final_rmse))
+
+print(metrics)
