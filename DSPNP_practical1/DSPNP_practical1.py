@@ -92,7 +92,7 @@ num_pipeline = Pipeline([
         ('selector', DataFrameSelector(num_attribs)),
         ('imputer', SimpleImputer(strategy="median")),
         ('attribs_adder', CombinedAttributesAdder()),
-        ('std_scaler', MinMaxScaler()),
+        ('std_scaler', StandardScaler()),
     ])
 
 cat_pipeline = Pipeline([
@@ -188,6 +188,7 @@ attributes = num_attribs + extra_attribs + cat_one_hot_attribs
 sorted(zip(feature_importances, attributes), reverse=True)
 
 final_model = grid_search.best_estimator_
+# final_model = lin_reg
 X_test = strat_test_set.drop("median_house_value", axis=1)
 y_test = strat_test_set["median_house_value"].copy()
 
