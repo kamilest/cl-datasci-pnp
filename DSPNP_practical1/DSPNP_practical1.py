@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split, StratifiedShuffleSplit
 from sklearn.model_selection import cross_val_score
-from sklearn.model_selection import GridSearchCV
+from sklearn.model_selection import GridSearchCV, RandomizedSearchCV
 from sklearn.base import TransformerMixin, BaseEstimator 
 from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import LabelBinarizer, StandardScaler, MinMaxScaler
@@ -175,7 +175,7 @@ print("cv mean on random forest {}".format(metrics["forest_cv"]))
 # specify the range of hyperparameter values for the grid search to try out 
 param_grid = {'n_estimators': [3, 10, 30], 'max_features': [2, 4, 6, 8]}
 forest_reg = RandomForestRegressor()
-grid_search = GridSearchCV(forest_reg, param_grid, cv=5,
+grid_search = RandomizedSearchCV(forest_reg, param_grid, cv=5,
                           scoring="neg_mean_squared_error")
 grid_search.fit(housing_prepared, housing_labels)
 cv_results = grid_search.cv_results_
@@ -188,6 +188,7 @@ attributes = num_attribs + extra_attribs + cat_one_hot_attribs
 sorted(zip(feature_importances, attributes), reverse=True)
 
 final_model = grid_search.best_estimator_
+
 # final_model = lin_reg
 X_test = strat_test_set.drop("median_house_value", axis=1)
 y_test = strat_test_set["median_house_value"].copy()
@@ -197,7 +198,17 @@ final_predictions = final_model.predict(X_test_prepared)
 final_mse = mean_squared_error(y_test, final_predictions)
 final_rmse = np.sqrt(final_mse)
 
-metrics["final_rmse"] = final_rmse
-print("rmse on random forest grid search {}".format(final_rmse))
+# metrics["final_rmse"] = final_rmse
+# print("rmse on random forest grid search {}".format(final_rmse))
+# print(metrics)
 
-print(metrics)
+# print("lin_reg: intercept_ = {} \n coef_ = {}".format(lin_reg.intercept_, lin_reg.coef_))
+
+# # pretty printing coefficients with attributes
+# extra_attribs = ['rooms_per_household', 'bedrooms_per_household', 'population_per_household', 'bedrooms_per_rooms']
+# cat_one_hot_attribs = ['<1H OCEAN', 'INLAND', 'ISLAND', 'NEAR BAY', 'NEAR OCEAN']
+# attributes = num_attribs + extra_attribs + cat_one_hot_attribs
+
+# feature_importances = grid_search.best_estimator_.feature_importances_
+# print(feature_importances)
+# print(sorted(zip(feature_importances, attributes), reverse=True))
