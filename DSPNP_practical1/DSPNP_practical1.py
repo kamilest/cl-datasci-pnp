@@ -175,9 +175,11 @@ print("cv mean on random forest {}".format(metrics["forest_cv"]))
 # specify the range of hyperparameter values for the grid search to try out 
 param_grid = {'n_estimators': [3, 10, 30], 'max_features': [2, 4, 6, 8]}
 forest_reg = RandomForestRegressor()
-grid_search = RandomizedSearchCV(forest_reg, param_grid, cv=5,
+grid_search = GridSearchCV(forest_reg, param_grid, cv=5,
                           scoring="neg_mean_squared_error")
 grid_search.fit(housing_prepared, housing_labels)
+print("grid search best params {}".format(grid_search.best_params_))
+
 cv_results = grid_search.cv_results_
 feature_importances = grid_search.best_estimator_.feature_importances_
 feature_importances
@@ -198,9 +200,9 @@ final_predictions = final_model.predict(X_test_prepared)
 final_mse = mean_squared_error(y_test, final_predictions)
 final_rmse = np.sqrt(final_mse)
 
-# metrics["final_rmse"] = final_rmse
-# print("rmse on random forest grid search {}".format(final_rmse))
-# print(metrics)
+metrics["final_rmse"] = final_rmse
+print("rmse on random forest grid search {}".format(final_rmse))
+print(metrics)
 
 # print("lin_reg: intercept_ = {} \n coef_ = {}".format(lin_reg.intercept_, lin_reg.coef_))
 
@@ -209,6 +211,13 @@ final_rmse = np.sqrt(final_mse)
 # cat_one_hot_attribs = ['<1H OCEAN', 'INLAND', 'ISLAND', 'NEAR BAY', 'NEAR OCEAN']
 # attributes = num_attribs + extra_attribs + cat_one_hot_attribs
 
-# feature_importances = grid_search.best_estimator_.feature_importances_
-# print(feature_importances)
-# print(sorted(zip(feature_importances, attributes), reverse=True))
+feature_importances = grid_search.best_estimator_.feature_importances_
+print(feature_importances)
+print(sorted(zip(feature_importances, attributes), reverse=True))
+
+# GRID SEARCH result comparison
+cv_results = grid_search.cv_results_
+for mean_score, params in zip(cv_results["mean_test_score"], cv_results["params"]):
+    print(np.sqrt(-mean_score), params)
+
+
