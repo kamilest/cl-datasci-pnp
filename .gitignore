@@ -2,6 +2,7 @@
 # Created by https://www.gitignore.io/api/macos,jupyternotebooks
 # Edit at https://www.gitignore.io/?templates=macos,jupyternotebooks
 .DS_Store
+bike_sharing/
 
 .vscode 
 
