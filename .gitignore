@@ -1,5 +1,7 @@
 lecture*/*
-final_assignment/
+final_assignment/diabetes
+final_assignment_2018
+
 getting-started.ipynb
 
 .idea/
@@ -62,3 +64,4 @@ Final_assignment.zip
 final_assignment_2018/Assignment.pdf
 final_assignment_2018/census/census-income.csv
 final_assignment_2018/census/census-income.names
+final_assignment/Assignment.pdf
