@@ -1,0 +1,89 @@
+\documentclass[12pt]{article}
+%% Language and font encodings
+\usepackage[english]{babel}
+
+\usepackage[T1]{fontenc}
+
+%% Sets page size and margins
+\usepackage[a4paper,top=3cm,bottom=3cm,left=2cm,right=2cm,marginparwidth=1.8cm]{geometry}
+
+\usepackage{amsmath,amssymb}  % Better maths support & more symbols
+\usepackage{bm}  % Define \bm{} to use bold math fonts
+\usepackage{mathtools}
+
+\usepackage[shortlabels]{enumitem}
+\usepackage[normalem]{ulem}
+
+\usepackage[utf8]{inputenc} % Any characters can be typed directly from the keyboard, eg ÃÂ©ÃÂ§ÃÂ±
+\DeclareUnicodeCharacter{2212}{-}
+
+\usepackage{parskip}
+
+\usepackage{hyperref}
+\urlstyle{same}
+
+% \renewcommand{\cfttoctitlefont}{\fontsize{12}{15}\selectfont\bfseries}
+% \renewcommand\cftsecfont{\small}
+% \renewcommand\cftsecafterpnum{\vskip 0pt}
+% \renewcommand\cftsecpagefont{\small}
+
+\usepackage{pdfsync}  % enable tex source and pdf output synchronicity
+
+
+\usepackage{fancyhdr}
+\fancypagestyle{first}{
+	\fancyhf{} % clear all header and footers
+	% \renewcommand{\headrulewidth}{0pt} % remove the line
+	% \setlength{\headheight}{30pt}
+	% \setlength{\footskip}{30pt}
+	% \fancyfoot[R]{\thepage}
+	% \fancyhead[R]{\svauthor \\ \college \\ \svsubject \\ \termweek/\svnumber}
+}
+
+\fancypagestyle{plain}{
+	\fancyhf{} % clear all header and footers
+	\renewcommand{\headrulewidth}{0pt} % remove the line
+	\setlength{\headheight}{30pt}
+	\setlength{\footskip}{30pt}
+	\fancyfoot[R]{\thepage}
+	\fancyhead[R]{\svauthor \\ \svsubject \\ \svshortsubject{}}
+}
+
+\def\svauthor{Kamilė Stankevičiūtė (\texttt{ks830})}
+\def\college{Gonville \& Caius College}
+\def\svsubject{Data Science: Principles and Practice}
+\def\svshortsubject{Final Assignment A}
+
+
+% editing commands and definitions
+%\def\chk{\textcolor{red}{\checkmark \thinspace}}
+%\usepackage{pifont}
+%\newcommand{\red}[1]{\textcolor{red}{#1}}
+\newcommand{\gray}[1]{\textcolor{gray}{#1}}
+%\setstcolor{red}
+
+% \usepackage{minted}
+% \usemintedstyle{colorful}
+
+\usepackage{pdfpages}
+
+
+\begin{document}
+\thispagestyle{first}
+\pagestyle{plain}
+
+\begin{center}
+\LARGE
+Data Science: Principles and Practice \\ Final Assignment A \\[4mm]
+
+\large
+Kamilė Stankevičiūtė (\texttt{ks830}) \\ Gonville \& Caius College
+
+\today % October 2019
+\end{center}
+
+\newpage
+hello
+
+
+\end{document}
