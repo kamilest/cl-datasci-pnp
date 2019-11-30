@@ -45,7 +45,7 @@
 \fancypagestyle{plain}{
 	\fancyhf{} % clear all header and footers
 	% \renewcommand{\headrulewidth}{0pt} % remove the line
-	% \setlength{\headheight}{15pt}
+	% \setlength{\headheight}{5pt}
 	\setlength{\footskip}{50pt}
 	\fancyfoot[C]{\thepage}
 	\fancyhead[C]{\textbf{\svsubject—\svshortsubject{}\ (ks830)}}
@@ -104,17 +104,32 @@ I examine the dataset of medical care records of diabetic patients over a period
 	\caption{Patient age distributions categorised by outcome and gender.}\label{genderagecountreadmitted}
 \end{figure}
 
-First I examine patient demographic data. The first part of Figure \ref{genderagecountreadmitted} shows the positively-skewed patient age distribution, where the majority of patients are from 50 to 90 years old. Generally, more adult patients are readmitted than not, and we can observe that patients from the age of 70 have higher occurrence of `<30' label compared to `>30', indicating that they are more likely to be readmitted sooner.
+First I examine patient demographic data. The first part of Figure \ref{genderagecountreadmitted} shows the positively-skewed patient age distribution, where the majority of patients are from 50 to 90 years old. Generally, more adult patients are readmitted than not, and we can observe that patients from the age of 60 have higher occurrence of `<30' label compared to `>30', indicating that they are more likely to be readmitted sooner.
 
 \begin{figure}
 	\centering
 	\includegraphics[width=\linewidth]{figures/gender_age_count.png}
-	\caption{Patient distributions by age, split by gender.}\label{genderagecount}
+	\caption{Patient age distribution by gender.}\label{genderagecount}
 \end{figure}
 
-Further categorising by gender (bottom part of Figure \ref{genderagecountreadmitted}), we can see that the readmittance frequency increases earlier for female patients, where the relative occurrence of `<30' and `>30' changes at 60-70 rather than 70-80 years old. In general, we can see that the proportion of female patients is higher with increased age, which can be also seen in Figure \ref{genderagecount}.
+Further categorising by gender (bottom part of Figure \ref{genderagecountreadmitted}), we can see that the readmission frequency increases earlier for female patients, where the relative occurrence of `<30' and `>30' changes at 60-70 rather than 70-80 years old. In general, we can see that for female patients both the absolute (compared to male) and relative (compared to younger female) admission numbers get higher with increased age, which can be also seen in Figure \ref{genderagecount}. This might suggest the longer lifespan of female patients.
 
-\subsection{Relation between diabetes conditions and readmission}
+\begin{figure*}[t!]
+	\includegraphics[width=\textwidth]{figures/disposition_time.png}
+	\caption{A violin plot showing the relationship between discharge disposition type, length of stay, and readmission.}\label{dispositiontime}
+  \end{figure*}
+
+  \begin{figure}
+	\centering
+	\includegraphics[width=\linewidth]{figures/time_in_hospital.png}
+	\caption{Densities of lengths of stay for the readmission outcomes.}\label{timeinhospital}
+  \end{figure}
+
+\subsection{Relationship between the type of treatment and readmission}
+One of the more interesting patterns between the numerical features and the readmission is related to discharge disposition (Figure \ref{dispositiontime}). For example, it makes sense that patients who died in the hospital cannot be readmitted (corresponding to the only category at id=11). On the other hand, all patients in this sample that have been discharged to another rehabilitation facility (id=22) or a long term care hospital (id=23) have been readmitted within 30 days. On the other hand, the length of stay is not necessarily correlated with readmission outcome, as shown, as they depend on the type of encounter. In fact, plotting densities of readmission and length of stay (Figure \ref{timeinhospital}).
+
+
+\subsection{Relationship between diabetes conditions and readmission}
 
 
 
