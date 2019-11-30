@@ -78,12 +78,14 @@ Kamilė Stankevičiūtė (\texttt{ks830}) \\ Gonville \& Caius College
 I examine the dataset of medical care records of diabetic patients over a period of 10 years (1999-2008), as presented in a given sample \textit{diabetic\_data\_balanced.csv}. 
 
 \subsection{Preprocessing}
-\paragraph{Missing values} The dataset has several features with missing values, most notably weight (97.0\%), payer code (97.6\%), and medical specialty (36.3\%). The first two will be excluded from further analysis. After comparing the numerical feature distributions for missing and non-missing medical specialty values, I will assume that the values are missing at random and replace them with a separate category.
+This section discusses how the data will be handled and prepared for further analysis.
 
-\paragraph{Anonymisation} Some patients have multiple encounter records (up to 15 per patient). This might skew the results of further analysis as models might learn to identify particular patients (through patient number or otherwise). For this reason at most one encounter per patient will be included in further analysis, and patient and encounter numbers removed. This leaves 7944 unique instances for further analysis.
+\paragraph{Anonymisation} Some patients have multiple encounter records (up to 15 per patient). This might skew the results of further analysis as models might learn to identify particular patients (through patient number or otherwise). For this reason at most one encounter per patient will be included in further analysis, and patient and encounter numbers removed. This leaves 7944 unique instances.
+
+\paragraph{Missing values} The dataset has several features with missing values, most notably weight (97.0\%), payer code (97.6\%), and medical specialty (36.3\%). The first two will be excluded from further analysis. After comparing the numerical feature distributions for missing and non-missing medical specialty values, I will assume that the values are missing at random and replace them (as well as the other categorical features with much smaller missing value percentage) with a separate category. There seems to be no numerical feature values missing.
 
 
-
+\subsection{Feature analysis}
 
 
 
