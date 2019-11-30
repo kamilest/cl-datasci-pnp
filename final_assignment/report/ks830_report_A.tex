@@ -1,11 +1,11 @@
-\documentclass[12pt, twocolumn]{article}
+\documentclass[11pt, twocolumn]{article}
 %% Language and font encodings
 \usepackage[english]{babel}
 
 \usepackage[T1]{fontenc}
 
 %% Sets page size and margins
-\usepackage[a4paper,top=3cm,bottom=3cm,left=2cm,right=2cm,marginparwidth=1.8cm]{geometry}
+\usepackage[a4paper,top=3cm,bottom=3cm,left=2cm,right=2cm]{geometry}
 
 \usepackage{amsmath,amssymb}  % Better maths support & more symbols
 \usepackage{bm}  % Define \bm{} to use bold math fonts
@@ -82,8 +82,9 @@ This section discusses how the data will be handled and prepared for further ana
 
 \paragraph{Anonymisation} Some patients have multiple encounter records (up to 15 per patient). This might skew the results of further analysis as models might learn to identify particular patients (through patient number or otherwise). For this reason at most one encounter per patient will be included in further analysis, and patient and encounter numbers removed. This leaves 7944 unique instances.
 
-\paragraph{Missing values} The dataset has several features with missing values, most notably weight (97.0\%), payer code (97.6\%), and medical specialty (36.3\%). The first two will be excluded from further analysis. After comparing the numerical feature distributions for missing and non-missing medical specialty values, I will assume that the values are missing at random and replace them (as well as the other categorical features with much smaller missing value percentage) with a separate category. There seems to be no numerical feature values missing.
+\paragraph{Missing values} The dataset has several features with missing values, most notably weight (97.0\%), payer code (97.6\%), and medical specialty (36.3\%). The first two will be excluded from further analysis. After comparing the numerical feature distributions for missing and non-missing medical specialty values, I will assume that the values are missing at random and replace them (as well as the other missing categorical features) with a separate category. There seems to be no numerical feature values missing.
 
+\paragraph{Train and test split} I chose 90\%/10\% stratified train/test split with 7149 train and 795 test instances.
 
 \subsection{Feature analysis}
 
