@@ -1,6 +1,6 @@
-\documentclass[11pt, twocolumn]{article}
+\documentclass[10pt, twocolumn]{article}
 %% Language and font encodings
-\usepackage[english]{babel}
+\usepackage[british]{babel}
 
 \usepackage[T1]{fontenc}
 
@@ -18,6 +18,7 @@
 \DeclareUnicodeCharacter{2212}{-}
 
 \usepackage{parskip}
+\usepackage{graphicx}
 
 \usepackage{hyperref}
 \urlstyle{same}
@@ -78,16 +79,21 @@ Kamilė Stankevičiūtė (\texttt{ks830}) \\ Gonville \& Caius College
 I examine the dataset of medical care records of diabetic patients over a period of 10 years (1999-2008), as presented in a given sample \textit{diabetic\_data\_balanced.csv}. 
 
 \subsection{Preprocessing}
-This section discusses how the data will be handled and prepared for further analysis.
 
-\paragraph{Anonymisation} Some patients have multiple encounter records (up to 15 per patient). This might skew the results of further analysis as models might learn to identify particular patients (through patient number or otherwise). For this reason at most one encounter per patient will be included in further analysis, and patient and encounter numbers removed. This leaves 7944 unique instances.
+\paragraph{Anonymisation} Some patients have multiple encounter records (up to 15 per patient). This might skew the results of further analysis (whether exploration or classification) as models might learn to identify particular patients (through patient number or otherwise). For this reason at most one randomly sampled encounter per patient will be included in further analysis, and patient and encounter numbers removed. This leaves 7944 unique instances.
 
-\paragraph{Missing values} The dataset has several features with missing values, most notably weight (97.0\%), payer code (97.6\%), and medical specialty (36.3\%). The first two will be excluded from further analysis. After comparing the numerical feature distributions for missing and non-missing medical specialty values, I will assume that the values are missing at random and replace them (as well as the other missing categorical features) with a separate category. There seems to be no numerical feature values missing.
+\paragraph{Missing values} The dataset has several features with missing values, most notably weight (97.0\%), payer code (97.6\%), and medical specialty (36.3\%). The first two will be excluded from further analysis. After comparing the numerical feature distributions for missing and non-missing medical specialty values, I will assume that the values are missing at random and replace them (as well as the other missing categorical feature values) with a separate category. There seems to be no numerical feature values missing.
 
 \paragraph{Train and test split} I chose 90\%/10\% stratified train/test split with 7149 train and 795 test instances.
 
-\subsection{Feature analysis}
+\subsection{Patient demographics}
+\begin{figure}
+	\centering
+	\caption{Patient distribution by age.}
+	\includegraphics[width=\linewidth]{age_count.png}\label{agecount}
+\end{figure}
 
+First I examine patient demographic data. Figure \ref{agecount} shows the positively-skewed patient age distribution, where the majority of patients are from 50 to 90 years old. Generally, more adult patients are readmitted than not, and we can observe that patients from the age of 70 have higher occurrence of `<30' label compared to `>30', indicating that they are more likely to be readmitted sooner.
 
 
 
