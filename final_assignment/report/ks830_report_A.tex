@@ -57,6 +57,7 @@
 \def\svshortsubject{Final Assignment A}
 
 \usepackage{pdfpages}
+\usepackage{float}
 
 \usepackage{minted}
 \usemintedstyle{colorful}
@@ -119,19 +120,17 @@ Further categorising by gender (bottom part of Figure \ref{genderagecountreadmit
 	\caption{A violin plot showing the relationship between discharge disposition type, length of stay, and readmission.}\label{dispositiontime}
   \end{figure*}
 
-  \begin{figure}
+\subsection{Relationship between the type of treatment and readmission}
+One of the more interesting patterns between the numerical features and the readmission is related to discharge disposition (Figure \ref{dispositiontime}). For example, it makes sense that patients who died in the hospital cannot be readmitted (corresponding to the only category at id=11). On the other hand, all patients in this sample that have been discharged to another rehabilitation facility (id=22) or a long term care hospital (id=23) have been readmitted within 30 days. On the other hand, the length of stay is not necessarily correlated with readmission outcome as this depends on the type of encounter. In fact, plotting densities of readmission and length of stay (Figure \ref{timeinhospital}), shows only a small difference in skew for readmission outcomes.
+
+\begin{figure}[H]
 	\centering
 	\includegraphics[width=\linewidth]{figures/time_in_hospital.png}
 	\caption{Densities of lengths of stay for the readmission outcomes.}\label{timeinhospital}
   \end{figure}
 
-\subsection{Relationship between the type of treatment and readmission}
-One of the more interesting patterns between the numerical features and the readmission is related to discharge disposition (Figure \ref{dispositiontime}). For example, it makes sense that patients who died in the hospital cannot be readmitted (corresponding to the only category at id=11). On the other hand, all patients in this sample that have been discharged to another rehabilitation facility (id=22) or a long term care hospital (id=23) have been readmitted within 30 days. On the other hand, the length of stay is not necessarily correlated with readmission outcome, as shown, as they depend on the type of encounter. In fact, plotting densities of readmission and length of stay (Figure \ref{timeinhospital}).
-
-
 \subsection{Relationship between diabetes conditions and readmission}
-
-
+The main focus of this dataset is the readmission outcomes for diabetic patients, and their relationship to diabetes-specific treatment.
 
 
 
