@@ -22,6 +22,7 @@
 \usepackage{parskip}
 \usepackage{graphicx}
 \graphicspath{{figures/}}
+
 \usepackage{subcaption}
 
 \usepackage{tabularx}
@@ -67,6 +68,7 @@
 % \usemintedstyle{colorful}
 
 \begin{document}
+
 \thispagestyle{first}
 \pagestyle{plain}
 \twocolumn[{
@@ -160,21 +162,21 @@ The main focus of this dataset is the readmission outcomes for diabetic patients
 
 \paragraph{Categorical features} For most categorical features I will be using one-hot encoding. However, to represent the order of age categories, I will encode the age feature as integers.
 
-\paragraph{Feature sets} I will analyse two feature sets: \textit{full} feature set with 192 total features (after preprocessing), and \textit{reduced} feature set with 87 features, which excludes the medication name data and medical specialty. 
+\paragraph{Feature sets} I will analyse two feature sets: \textit{full} feature set with 198 total features (after preprocessing), and \textit{reduced} feature set with 93 features, which excludes the medication name data and medical specialty. 
 
 \paragraph{Train and test split} I chose 90\%/10\% stratified train/test split with 7149 train and 795 test instances.
 
 \subsection{Simple multi-class classifiers}
 Prediction of three readmission outcome labels is an instance of a multi-class classification task. I implement the multi-class \textit{Naive Bayes}, \textit{stochastic gradient descent} and \textit{logistic regression} classifiers (using \textit{one-vs-all} strategy where appropriate).
 
-The results are generally better for the reduced feature set, where 5-fold cross-validation gave the best results for \texttt{LogisticRegression} classifier (mean accuracy 53.4\%). All three classifiers performed better than the baseline mean accuracy (random guessing based on label distribution) of 33.3\% (Table \ref{multiclass}). 
+The results are generally better for the reduced feature set, where 5-fold cross-validation gave the best results for \texttt{LogisticRegression} classifier (mean accuracy 53.4\%). All three classifiers performed better than the baseline mean accuracy (random guessing based on label distribution) of 33.3\% (Table \ref{multiclass}). Further grid search on regularisation parameters and regularisation strength increased the mean cross-validation accuracy of logistic regression classifier to 53.9\%.
 
 \begin{table}[]
 	\begin{tabularx}{\linewidth}{XXXXX}
 		\hline
 								 & \textbf{Baseline} & \textbf{NB} & \textbf{LogReg} & \textbf{SGD} \\ \hline
-		full   & 33.3\%            & 37.1\%      & 53.3\%          & 49.2\%       \\
-		reduced & 33.3\%            & 38.5\%      & 53.6\%          & 52.2\%       \\ \hline
+		full   & 33.3\%            & 37.2\%      & 53.6\%          & 50.2\%       \\
+		reduced & 33.3\%            & 38.7\%      & 53.8\%          & 52.8\%       \\ \hline
 		\end{tabularx}
 \caption{Mean cross-validation accuracies for selected multi-class classifiers and feature sets.}\label{multiclass}
 \end{table}
@@ -182,6 +184,7 @@ The results are generally better for the reduced feature set, where 5-fold cross
 \paragraph{Kernel trick} Transforming the reduced feature set using the \texttt{RBFSampler} with default parameters resulted in accuracies between 34\% and 37\%, therefore worse predictive power.
 
 \subsection{Ensemble models}
+
 
 
 
