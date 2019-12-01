@@ -7,6 +7,8 @@
 %% Sets page size and margins
 \usepackage[a4paper,top=3cm,bottom=3cm,left=2cm,right=2cm]{geometry}
 
+\setlength{\columnsep}{12pt}
+
 \usepackage{amsmath,amssymb}  % Better maths support & more symbols
 \usepackage{bm}  % Define \bm{} to use bold math fonts
 \usepackage{mathtools}
@@ -87,11 +89,15 @@ I examine the dataset of medical care records of diabetic patients over a period
 
 \paragraph{Missing values} The dataset has several features with missing values, most notably weight (97.0\%), payer code (97.6\%), and medical specialty (36.3\%). The first two will be excluded from further analysis. After comparing the numerical feature distributions for missing and non-missing medical specialty values, I will assume that the values are missing at random and replace them (as well as the other missing categorical feature values) with a separate category. There seems to be no numerical feature values missing.
 
+\paragraph{Categorical features} For the machine learning task, I will encode most categorical features using one-hot encoding. However, in some cases I think it is reasonable to represent the relative ordering of values. I will therefore transform the age intervals to integers, and split the glucose and A1c tests into two variables: a boolean for whether the test was taken, and the ordered values of the test results otherwise.
+
 \paragraph{Train and test split} I chose 90\%/10\% stratified train/test split with 7149 train and 795 test instances.
 
 \subsection{Patient demographics}
 
-\begin{figure}
+First I examine patient demographic data. The first part of Figure \ref{genderagecountreadmitted} shows the positively-skewed patient age distribution, where the majority of patients are from 50 to 90 years old.
+
+\begin{figure}[H]
 	\centering
 	\begin{subfigure}[t]{0.5\textwidth}
         \centering
@@ -104,27 +110,29 @@ I examine the dataset of medical care records of diabetic patients over a period
     \end{subfigure}
 	\caption{Patient age distributions categorised by outcome and gender.}\label{genderagecountreadmitted}
 \end{figure}
-
-First I examine patient demographic data. The first part of Figure \ref{genderagecountreadmitted} shows the positively-skewed patient age distribution, where the majority of patients are from 50 to 90 years old. Generally, more adult patients are readmitted than not, and we can observe that patients from the age of 60 have higher occurrence of `<30' label compared to `>30', indicating that they are more likely to be readmitted sooner.
-
-\begin{figure}
+\begin{figure}[H]
 	\centering
 	\includegraphics[width=\linewidth]{figures/gender_age_count.png}
 	\caption{Patient age distribution by gender.}\label{genderagecount}
 \end{figure}
-
-Further categorising by gender (bottom part of Figure \ref{genderagecountreadmitted}), we can see that the readmission frequency increases earlier for female patients, where the relative occurrence of `<30' and `>30' changes at 60-70 rather than 70-80 years old. In general, we can see that for female patients both the absolute (compared to male) and relative (compared to younger female) admission numbers get higher with increased age, which can be also seen in Figure \ref{genderagecount}. This might suggest the longer lifespan of female patients.
-
 \begin{figure*}[t!]
+	\center
 	\includegraphics[width=\textwidth]{figures/kdeplots.png}
 	\caption{The kernel density estimates for various numerical features in relation to readmission outcome.}\label{kdeplots}
   \end{figure*}
+\newpage
+
+Generally, more adult patients are readmitted than not, and we can observe that patients from the age of 60 have higher occurrence of `<30' label compared to `>30', indicating that they are more likely to be readmitted sooner.
+
+Further categorising by gender (bottom part of Figure \ref{genderagecountreadmitted}), we can see that the readmission frequency increases earlier for female patients, where the relative occurrence of `<30' and `>30' changes at 60-70 rather than 70-80 years old. In general, we can see that for female patients both the absolute (compared to male) and relative (compared to younger female) admission numbers get higher with increased age, which can be also seen in Figure \ref{genderagecount}. This might suggest the longer lifespan of female patients.
+
+
 
 \subsection{Relationship between the type of treatment and readmission}
 
 For this particular dataset, the kernel density estimate plots seemed to represent most of the important trends of the full scatter plot matrix while being much easier to read (Figure \ref{kdeplots}). The most interesting insights I observed were:
 
-The first peak in admission\_type\_id corresponds to emergency encounters which are very likely to result in readmission within 30 days.
+The first peak in admission\_type\_id corresponds to emergency encounters which are very likely to result in readmission within 30 days, since the blue peak there is the highest.
 
 A green peak at id=11 for discharge\_disposition\_id represents the patients who died at the hospital and therefore could never be readmitted. Some discharge disposition types (id=22, id=23) were associated only with patients readmitted within 30 days. Those ids correspond to transfers to another rehabilitation facility and transfers to long term care hospitals.
 
@@ -132,19 +140,17 @@ Patients are likely to be readmitted (the high orange peak) if they come from an
 
 The length of stay distribution is more skewed to the right for the patients who were readmitted sooner, i.e. the patients which stayed for longer were more likely to be readmitted.
 
-The higher number of diagnoses is associated with the likelihood of readmission as seen from higher densities of orange and blue curves in the last subplot.
+The higher number of diagnoses is associated with the likelihood of readmission as seen from higher densities of orange and blue curves with higher number of diagnoses in the last subplot.
 
 
 \subsection{Relationship between diabetes conditions and readmission}
 The main focus of this dataset is the readmission outcomes for diabetic patients, and their relationship to diabetes-specific treatment.
 
+\section{Machine learning algorithms implementation}
 
+\section{Evaluation}
 
-
-
-
-\newpage
-\clearpage
+\section{Dimensionality reduction and embeddings}
 
 
 \end{document}
