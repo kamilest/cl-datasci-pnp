@@ -54,16 +54,6 @@ from sklearn.metrics import accuracy_score
 # import sklearn.manifold
 # import sklearn.model_selection
 
-
-class CustomLabelBinarizer(TransformerMixin):
-    def __init__(self, *args, **kwargs):
-        self.encoder = LabelBinarizer(*args, **kwargs)
-    def fit(self, X, y=0):
-        self.encoder.fit(X)
-        return self
-    def transform(self, X, y=0):
-        return self.encoder.transform(X)
-
 class DataFrameSelector(BaseEstimator, TransformerMixin):
     def __init__(self, attribute_names):
         self.attribute_names = attribute_names
@@ -92,15 +82,17 @@ diabetic_labels = strat_train_set["readmitted"].copy()
 
 # PREPROCESSING PIPELINE
 diabetic_num_to_cat_features = ['admission_type_id', 'discharge_disposition_id','admission_source_id']
-diabetic_cat_to_num_features = []
+diabetic_cat_to_num_features = ['max_glu_serum', 'A1Cresult']
 
-# diabetic_num_features = ['time_in_hospital', 'num_lab_procedures','num_procedures', 'num_medications', 'number_outpatient', 'number_emergency', 'number_inpatient', 'number_diagnoses']
+diabetic_num_features = ['time_in_hospital', 'num_lab_procedures','num_procedures', 'num_medications', 'number_outpatient', 'number_emergency', 'number_inpatient', 'number_diagnoses']
 
-diabetic_num_features = ['time_in_hospital', 'num_lab_procedures','num_procedures', 'num_medications', 'number_diagnoses']
+# diabetic_num_features = ['time_in_hospital', 'num_lab_procedures','num_procedures', 'num_medications', 'number_diagnoses']
 
-# diabetic_cat_features = ['race', 'gender', 'medical_specialty', 'diag_1', 'diag_2', 'diag_3', 'metformin', 'repaglinide', 'nateglinide','chlorpropamide', 'glimepiride', 'acetohexamide', 'glipizide', 'glyburide','tolbutamide', 'pioglitazone', 'rosiglitazone', 'acarbose', 'miglitol','troglitazone', 'tolazamide', 'examide', 'citoglipton', 'insulin', 'glyburide-metformin', 'glipizide-metformin', 'glimepiride-pioglitazone','metformin-rosiglitazone', 'metformin-pioglitazone', 'change', 'diabetesMed']
+# diabetic_drugs = ['medical_specialty', 'metformin', 'repaglinide', 'nateglinide','chlorpropamide', 'glimepiride', 'acetohexamide', 'glipizide', 'glyburide','tolbutamide', 'pioglitazone', 'rosiglitazone', 'acarbose', 'miglitol','troglitazone', 'tolazamide', 'examide', 'citoglipton', 'insulin', 'glyburide-metformin', 'glipizide-metformin', 'glimepiride-pioglitazone','metformin-rosiglitazone', 'metformin-pioglitazone']
 
-diabetic_cat_features_no_drugs = ['gender','change', 'diabetesMed', 'max_glu_serum', 'A1Cresult']
+diabetic_drugs = []
+
+diabetic_cat_features = ['gender','change', 'diabetesMed']
 diabetic_diag_features = ['diag_1', 'diag_2', 'diag_3']
 
 num_pipeline = Pipeline([
@@ -161,7 +153,7 @@ diag_pipeline = Pipeline([
 ])
 
 cat_pipeline = Pipeline([
-    ('selector', DataFrameSelector(diabetic_num_to_cat_features + diabetic_cat_features_no_drugs + diabetic_cat_to_num_features)),
+    ('selector', DataFrameSelector(diabetic_num_to_cat_features + diabetic_cat_features + diabetic_drugs + diabetic_cat_to_num_features)),
     ('imputer', SimpleImputer(strategy='constant')),
     ('encoder', OneHotEncoder(categories='auto', sparse=False))
 
@@ -184,18 +176,42 @@ y_train = diabetic_labels
 
 
 # MULTI-CLASS CLASSIFIERS 
-sgd = SGDClassifier()
+sgd = SGDClassifier(random_state=42)
 cv_sgd = cross_val_score(sgd, X_train, y_train, cv=10, scoring='accuracy')
-print(cv_sgd, np.mean(cv_sgd))
+# print(cv_sgd, np.mean(cv_sgd))
+print('SGD', np.mean(cv_sgd))
 
-log_reg = LogisticRegression(multi_class='ovr', solver='liblinear')
-cv_log_reg = cross_val_score(log_reg, X_train, y_train, cv=10, scoring='accuracy')
-print(cv_log_reg, np.mean(cv_log_reg))
+log_reg = LogisticRegression(random_state=42, multi_class='ovr', solver='liblinear')
+cv_log_reg = cross_val_score(log_reg, X_train, y_train, cv=5, scoring='accuracy')
+# print(cv_log_reg, np.mean(cv_log_reg))
+print('LR', np.mean(cv_log_reg))
+
 
 gnb = GaussianNB()
-cv_gnb = cross_val_score(gnb, X_train, y_train, cv=10, scoring='accuracy')
-print(cv_gnb, np.mean(cv_gnb))
+cv_gnb = cross_val_score(gnb, X_train, y_train, cv=5, scoring='accuracy')
+# print(cv_gnb, np.mean(cv_gnb))
+print('NB', np.mean(cv_gnb))
 
 baseline = DummyClassifier(random_state=42)
-cv_baseline = cross_val_score(baseline, X_train, y_train, cv=10, scoring='accuracy')
-print(cv_baseline, np.mean(cv_baseline))
+cv_baseline = cross_val_score(baseline, X_train, y_train, cv=5, scoring='accuracy')
+# print(cv_baseline, np.mean(cv_baseline))
+print("cv_baseline", np.mean(cv_baseline))
+
+print()
+
+from sklearn.kernel_approximation import RBFSampler
+rbf_features = RBFSampler(gamma=1, n_components=100, random_state=42)
+X_train_features = rbf_features.fit_transform(X_train)
+print(X_train_features.shape)
+
+sgd = SGDClassifier(random_state=42)
+cv_sgd = cross_val_score(sgd, X_train_features, y_train, cv=5, scoring='accuracy')
+print('cv_sgd', np.mean(cv_sgd))
+
+log_reg = LogisticRegression(random_state=42, multi_class='ovr', solver='liblinear')
+cv_log_reg = cross_val_score(log_reg, X_train_features, y_train, cv=5, scoring='accuracy')
+print('cv_log_reg', np.mean(cv_log_reg))
+
+gnb = GaussianNB()
+cv_gnb = cross_val_score(gnb, X_train_features, y_train, cv=5, scoring='accuracy')
+print('cv_gnb', np.mean(cv_gnb))
