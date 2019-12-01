@@ -100,6 +100,7 @@ num_pipeline = Pipeline([
 age_pipeline = Pipeline([
     ('selector', DataFrameSelector(['age'])),
     ('ordinal_encoder', OrdinalEncoder(categories=[['[0-10)', '[10-20)', '[20-30)', '[30-40)', '[40-50)', '[50-60)', '[60-70)', '[70-80)', '[80-90)', '[90-100)']])),
+    ('std_scaler', StandardScaler()),
 ])
 
 cat_pipeline = Pipeline([
@@ -116,3 +117,4 @@ full_pipeline = FeatureUnion(transformer_list=[
 ])
 
 diabetic_prepared = full_pipeline.fit_transform(diabetic_features)
+
