@@ -91,6 +91,8 @@ diabetic_num_features = ['time_in_hospital', 'num_lab_procedures','num_procedure
 
 diabetic_cat_features = ['race', 'gender', 'medical_specialty', 'diag_1', 'diag_2', 'diag_3', 'metformin', 'repaglinide', 'nateglinide','chlorpropamide', 'glimepiride', 'acetohexamide', 'glipizide', 'glyburide','tolbutamide', 'pioglitazone', 'rosiglitazone', 'acarbose', 'miglitol','troglitazone', 'tolazamide', 'examide', 'citoglipton', 'insulin', 'glyburide-metformin', 'glipizide-metformin', 'glimepiride-pioglitazone','metformin-rosiglitazone', 'metformin-pioglitazone', 'change', 'diabetesMed']
 
+diabetic_cat_features_no_drugs = ['race', 'gender', 'medical_specialty', 'diag_1', 'diag_2', 'diag_3', 'change', 'diabetesMed']
+
 num_pipeline = Pipeline([
     ('selector', DataFrameSelector(diabetic_num_features)),
     ('imputer', SimpleImputer(strategy="median")),
@@ -104,8 +106,8 @@ age_pipeline = Pipeline([
 ])
 
 cat_pipeline = Pipeline([
-    ('selector', DataFrameSelector(diabetic_num_to_cat_features + diabetic_cat_features + diabetic_cat_to_num_features)),
-    ('imputer', SimpleImputer(strategy="constant")),
+    ('selector', DataFrameSelector(diabetic_num_to_cat_features + diabetic_cat_features_no_drugs + diabetic_cat_to_num_features)),
+    ('imputer', SimpleImputer(strategy='constant')),
     ('encoder', OneHotEncoder(categories='auto'))
 
 ])
