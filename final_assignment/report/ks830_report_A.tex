@@ -81,13 +81,13 @@ Kamilė Stankevičiūtė (\texttt{ks830}) \\ Gonville \& Caius College
 
 \section{Data exploration}
 
-I examine the dataset of medical care records of diabetic patients over a period of 10 years (1999-2008), as presented in a given sample \textit{diabetic\_data\_balanced.csv}. This analysis has been done on `anonymised' data as described in the next section.
+I examine the dataset of medical care records of diabetic patients over a period of 10 years (1999-2008), as presented in a given sample \textit{diabetic\_data\_balanced.csv}. This analysis has been done on the subset with at most one record per patient, as described in the next section.
 
 \subsection{Patient demographics}
 
 First I examine patient demographic data. The first part of Figure \ref{genderagecountreadmitted} shows the positively-skewed patient age distribution, where the majority of patients are from 50 to 90 years old.
 
-\begin{figure}[H]
+\begin{figure}[htb!]
 	\centering
 	\begin{subfigure}[t]{0.5\textwidth}
         \centering
@@ -102,19 +102,31 @@ First I examine patient demographic data. The first part of Figure \ref{genderag
 \end{figure}
 Generally, more adult patients are readmitted than not, and we can observe that patients from the age of 60 have higher occurrence of `<30' label compared to `>30', indicating that they are more likely to be readmitted sooner.
 
-\begin{figure}[H]
+\begin{figure}[htb!]
 	\centering
 	\includegraphics[width=\linewidth]{figures/gender_age_count.png}
 	\caption{Patient age distribution by gender.}\label{genderagecount}
 \end{figure}
-\begin{figure*}[t!]
-	\center
-	\includegraphics[width=\textwidth]{figures/kdeplots.png}
-	\caption{The kernel density estimates for various numerical features in relation to readmission outcome.}\label{kdeplots}
-  \end{figure*}
-\newpage
 
 Further categorising by gender (bottom part of Figure \ref{genderagecountreadmitted}), we can see that the readmission frequency increases earlier for female patients, where the relative occurrence of `<30' and `>30' changes at 60-70 rather than 70-80 years old. In general, we can see that for female patients both the absolute (compared to male) and relative (compared to younger female) admission numbers get higher with increased age, which can be also seen in Figure \ref{genderagecount}. This might suggest the longer lifespan of female patients.
+
+\begin{figure*}[t!]
+	\centering
+	\begin{subfigure}[t]{\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figures/idplots.png}
+	\end{subfigure}
+	~
+	\begin{subfigure}[t]{\textwidth}
+        \centering
+		\includegraphics[width=\textwidth]{figures/kdeplots.png}
+    \end{subfigure}
+	\caption{Distributions of admission and discharge identifiers; kernel density estimates for numerical features.}\label{kdeplots}
+  \end{figure*}
+
+
+
+
 
 \subsection{Relationship between the type of treatment and readmission}
 
@@ -142,7 +154,7 @@ The main focus of this dataset is the readmission outcomes for diabetic patients
 
 \paragraph{Missing values} The dataset has several features with missing values, most notably weight (97.0\%), payer code (97.6\%), and medical specialty (36.3\%). The first two will be excluded from further analysis. After comparing the numerical feature distributions for missing and non-missing medical specialty values, I will assume that the values are missing at random and replace them (as well as the other missing categorical feature values) with a separate category. There seems to be no numerical feature values missing.
 
-\paragraph{Numerical features} TODO
+\paragraph{Numerical features} Some features, such as admission source, type, and discharge identifiers should be numeric as the values should not have any ordering associated with them. I will convert those features to one-hot-endocded vectors.
 
 \paragraph{Categorical features} For the machine learning task, I will encode most categorical features using one-hot encoding. However, in some cases I think it is reasonable to represent the relative ordering of values. I will therefore transform the age intervals to integers, and split the glucose and A1c tests into two variables: a boolean for whether the test was taken, and the ordered values of the test results otherwise.
 
