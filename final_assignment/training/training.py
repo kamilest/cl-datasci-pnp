@@ -9,6 +9,9 @@ import sklearn
 from sklearn.model_selection import StratifiedShuffleSplit
 from sklearn.impute import SimpleImputer
 from sklearn.base import TransformerMixin, BaseEstimator 
+
+from sklearn.dummy import DummyClassifier
+
 from sklearn.pipeline import Pipeline, FeatureUnion
 from sklearn.preprocessing import LabelBinarizer, OrdinalEncoder, OneHotEncoder, StandardScaler, MinMaxScaler
 
@@ -192,3 +195,7 @@ print(cv_log_reg, np.mean(cv_log_reg))
 gnb = GaussianNB()
 cv_gnb = cross_val_score(gnb, X_train, y_train, cv=5, scoring='accuracy')
 print(cv_gnb, np.mean(cv_gnb))
+
+baseline = DummyClassifier()
+cv_baseline = cross_val_score(baseline, X_train, y_train, cv=5, scoring='accuracy')
+print(cv_baseline, np.mean(cv_baseline))
