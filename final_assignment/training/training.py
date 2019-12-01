@@ -6,45 +6,31 @@ import scipy
 import math
 
 import sklearn
-from sklearn.model_selection import StratifiedShuffleSplit
+from sklearn.model_selection import GridSearchCV, RandomizedSearchCV, StratifiedShuffleSplit, cross_val_score
+from sklearn.metrics import accuracy_score
+
 from sklearn.impute import SimpleImputer
 from sklearn.base import TransformerMixin, BaseEstimator 
 
 from sklearn.dummy import DummyClassifier
 
 from sklearn.pipeline import Pipeline, FeatureUnion
-from sklearn.preprocessing import LabelBinarizer, OrdinalEncoder, OneHotEncoder, StandardScaler, MinMaxScaler
+from sklearn.preprocessing import OrdinalEncoder, OneHotEncoder, StandardScaler
 
 from sklearn.linear_model import LogisticRegression, SGDClassifier
 from sklearn.naive_bayes import GaussianNB
 
-from sklearn.model_selection import cross_val_score
-from sklearn.metrics import accuracy_score
-
-# from sklearn.model_selection import GridSearchCV, RandomizedSearchCV
+from sklearn.ensemble import VotingClassifier, RandomForestClassifier
+from sklearn.svm import SVC
 
 
-
-# from sklearn.preprocessing import PolynomialFeatures
-
-
-# from sklearn.tree import DecisionTreeRegressor
-# from sklearn.ensemble import RandomForestRegressor
 # from sklearn.metrics import mean_squared_error
-
-# from sklearn.ensemble import VotingClassifier
-
-# from sklearn.ensemble import RandomForestClassifier
-# from sklearn.svm import SVC
-
-# from sklearn.metrics import accuracy_score
 
 # from sklearn.ensemble import BaggingClassifier
 # from sklearn.tree import DecisionTreeClassifier
 
 # from sklearn.ensemble import AdaBoostClassifier
 
-# from sklearn.tree import DecisionTreeRegressor
 
 # from sklearn.ensemble import GradientBoostingRegressor
 
@@ -72,27 +58,30 @@ diabetic = diabetic.groupby('patient_nbr', group_keys=False) \
 
 
 # Train test split
+X, y = diabetic.drop('readmitted', axis=1), diabetic['readmitted']
+
 split = StratifiedShuffleSplit(n_splits=1, test_size=0.1, random_state=42)
-for train_index, test_index in split.split(diabetic, diabetic['readmitted']):
-    strat_train_set = diabetic.iloc[train_index]
-    strat_test_set = diabetic.iloc[test_index]
+for train_index, test_index in split.split(X, y):
+     X_train, X_test = X.iloc[train_index], X.iloc[test_index]
+     y_train, y_test = y.iloc[train_index], y.iloc[test_index]
     
-diabetic_features = strat_train_set.drop("readmitted", axis=1)
-diabetic_labels = strat_train_set["readmitted"].copy()
+# diabetic_features = strat_train_set.drop("readmitted", axis=1)
+# diabetic_labels = strat_train_set["readmitted"].copy()
 
 # PREPROCESSING PIPELINE
 diabetic_num_to_cat_features = ['admission_type_id', 'discharge_disposition_id','admission_source_id']
+
 diabetic_cat_to_num_features = ['max_glu_serum', 'A1Cresult']
 
 diabetic_num_features = ['time_in_hospital', 'num_lab_procedures','num_procedures', 'num_medications', 'number_outpatient', 'number_emergency', 'number_inpatient', 'number_diagnoses']
 
 # diabetic_num_features = ['time_in_hospital', 'num_lab_procedures','num_procedures', 'num_medications', 'number_diagnoses']
 
-# diabetic_drugs = ['medical_specialty', 'metformin', 'repaglinide', 'nateglinide','chlorpropamide', 'glimepiride', 'acetohexamide', 'glipizide', 'glyburide','tolbutamide', 'pioglitazone', 'rosiglitazone', 'acarbose', 'miglitol','troglitazone', 'tolazamide', 'examide', 'citoglipton', 'insulin', 'glyburide-metformin', 'glipizide-metformin', 'glimepiride-pioglitazone','metformin-rosiglitazone', 'metformin-pioglitazone']
+diabetic_drugs = ['medical_specialty', 'metformin', 'repaglinide', 'nateglinide','chlorpropamide', 'glimepiride', 'acetohexamide', 'glipizide', 'glyburide','tolbutamide', 'pioglitazone', 'rosiglitazone', 'acarbose', 'miglitol','troglitazone', 'tolazamide', 'examide', 'citoglipton', 'insulin', 'glyburide-metformin', 'glipizide-metformin', 'glimepiride-pioglitazone','metformin-rosiglitazone', 'metformin-pioglitazone']
 
-diabetic_drugs = []
+# diabetic_drugs = []
 
-diabetic_cat_features = ['gender','change', 'diabetesMed']
+diabetic_cat_features = ['race', 'gender', 'change', 'diabetesMed']
 diabetic_diag_features = ['diag_1', 'diag_2', 'diag_3']
 
 num_pipeline = Pipeline([
@@ -166,57 +155,61 @@ full_pipeline = FeatureUnion(transformer_list=[
     ("cat_pipeline", cat_pipeline),
 ])
 
-diabetic_prepared = full_pipeline.fit_transform(diabetic_features)
+X_train = full_pipeline.fit_transform(X_train)
 
 
 # MACHINE LEARNING ALGORITHMS
-X_train = diabetic_prepared
 print(X_train.shape)
-y_train = diabetic_labels
 
 
 # MULTI-CLASS CLASSIFIERS 
-# sgd = SGDClassifier(random_state=42)
-# cv_sgd = cross_val_score(sgd, X_train, y_train, cv=10, scoring='accuracy')
-# # print(cv_sgd, np.mean(cv_sgd))
-# print('SGD', np.mean(cv_sgd))
 
-# log_reg = LogisticRegression(random_state=42, multi_class='ovr', solver='liblinear')
-# cv_log_reg = cross_val_score(log_reg, X_train, y_train, cv=5, scoring='accuracy')
-# # print(cv_log_reg, np.mean(cv_log_reg))
-# print('LR', np.mean(cv_log_reg))
+sgd = SGDClassifier(random_state=42)
+cv_sgd = cross_val_score(sgd, X_train, y_train, cv=5, scoring='accuracy')
+# print(cv_sgd, np.mean(cv_sgd))
+print('cv_sgd', np.mean(cv_sgd))
+
+log_reg = LogisticRegression(random_state=42, multi_class='ovr', solver='liblinear')
+cv_log_reg = cross_val_score(log_reg, X_train, y_train, cv=5, scoring='accuracy')
+# print(cv_log_reg, np.mean(cv_log_reg))
+print('cv_log_reg', np.mean(cv_log_reg))
 
 
-# gnb = GaussianNB()
-# cv_gnb = cross_val_score(gnb, X_train, y_train, cv=5, scoring='accuracy')
-# # print(cv_gnb, np.mean(cv_gnb))
-# print('NB', np.mean(cv_gnb))
+gnb = GaussianNB()
+cv_gnb = cross_val_score(gnb, X_train, y_train, cv=5, scoring='accuracy')
+# print(cv_gnb, np.mean(cv_gnb))
+print('cv_gnb', np.mean(cv_gnb))
 
-# baseline = DummyClassifier(random_state=42)
-# cv_baseline = cross_val_score(baseline, X_train, y_train, cv=5, scoring='accuracy')
-# # print(cv_baseline, np.mean(cv_baseline))
-# print("cv_baseline", np.mean(cv_baseline))
+baseline = DummyClassifier(random_state=42)
+cv_baseline = cross_val_score(baseline, X_train, y_train, cv=5, scoring='accuracy')
+# print(cv_baseline, np.mean(cv_baseline))
+print("cv_baseline", np.mean(cv_baseline))
 
-# print()
+print()
 
-# from sklearn.kernel_approximation import RBFSampler
-# rbf_features = RBFSampler(gamma=1, n_components=100, random_state=42)
-# X_train_features = rbf_features.fit_transform(X_train)
-# print(X_train_features.shape)
 
-# sgd = SGDClassifier(random_state=42)
-# cv_sgd = cross_val_score(sgd, X_train_features, y_train, cv=5, scoring='accuracy')
-# print('cv_sgd', np.mean(cv_sgd))
+# KERNEL TRICK 
 
-# log_reg = LogisticRegression(random_state=42, multi_class='ovr', solver='liblinear')
-# cv_log_reg = cross_val_score(log_reg, X_train_features, y_train, cv=5, scoring='accuracy')
-# print('cv_log_reg', np.mean(cv_log_reg))
+from sklearn.kernel_approximation import RBFSampler
+rbf_features = RBFSampler(gamma=1, n_components=100, random_state=42)
+X_train_features = rbf_features.fit_transform(X_train)
+print(X_train_features.shape)
 
-# gnb = GaussianNB()
-# cv_gnb = cross_val_score(gnb, X_train_features, y_train, cv=5, scoring='accuracy')
-# print('cv_gnb', np.mean(cv_gnb))
+sgd = SGDClassifier(random_state=42)
+cv_sgd = cross_val_score(sgd, X_train_features, y_train, cv=5, scoring='accuracy')
+print('cv_sgd', np.mean(cv_sgd))
 
-from sklearn.model_selection import GridSearchCV
+log_reg = LogisticRegression(random_state=42, multi_class='ovr', solver='liblinear')
+cv_log_reg = cross_val_score(log_reg, X_train_features, y_train, cv=5, scoring='accuracy')
+print('cv_log_reg', np.mean(cv_log_reg))
+
+gnb = GaussianNB()
+cv_gnb = cross_val_score(gnb, X_train_features, y_train, cv=5, scoring='accuracy')
+print('cv_gnb', np.mean(cv_gnb))
+
+print()
+
+# GRID SEARCH
 
 # specify the range of hyperparameter values for the grid search to try out 
 param_grid = {'penalty': ['l1', 'l2'], 'C': [0.25, 0.5, 1.0]}
@@ -227,3 +220,17 @@ grid_search = GridSearchCV(forest_reg, param_grid, cv=5,
 grid_search.fit(X_train, y_train)
 
 print(grid_search.best_params_, grid_search.best_score_)
+
+print()
+
+log_clf = LogisticRegression(random_state=42, multi_class='ovr', solver='liblinear')
+rnd_clf = RandomForestClassifier(random_state=42, n_estimators=100)
+svm_clf = SVC(random_state=42, gamma='scale')
+
+voting_clf = VotingClassifier(
+    estimators=[('lr', log_clf), ('rf', rnd_clf), ('svc', svm_clf)],
+    voting='hard')
+
+cv_voting = cross_val_score(voting_clf, X_train, y_train, cv=5, scoring="accuracy")
+print('cv_voting', np.mean(cv_voting))
+
