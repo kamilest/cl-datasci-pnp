@@ -154,7 +154,7 @@ The main focus of this dataset is the readmission outcomes for diabetic patients
 
 \paragraph{Missing values} The dataset has several features with missing values, most notably weight (97.0\%), payer code (97.6\%), and medical specialty (36.3\%). The first two will be excluded from further analysis. After comparing the numerical feature distributions for missing and non-missing medical specialty values, I will assume that the values are missing at random and replace them (as well as the other missing categorical feature values) with a separate category. There seems to be no numerical feature values missing.
 
-\paragraph{Numerical features} Some features, such as admission source, type, and discharge identifiers should be numeric as the values should not have any ordering associated with them. I will convert those features to one-hot-endocded vectors.
+\paragraph{Numerical features} Some features, such as admission source, type, and discharge identifiers should be numeric as the values should not have any ordering associated with them. I will convert those features to one-hot-endocded vectors. Otherwise numerical features will be normalised.
 
 \paragraph{Categorical features} For the machine learning task, I will encode most categorical features using one-hot encoding. However, in some cases I think it is reasonable to represent the relative ordering of values. I will therefore transform the age intervals to integers, and split the glucose and A1c tests into two variables: a boolean for whether the test was taken, and the ordered values of the test results otherwise.
 
