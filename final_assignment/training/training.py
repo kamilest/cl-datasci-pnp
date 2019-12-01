@@ -176,42 +176,54 @@ y_train = diabetic_labels
 
 
 # MULTI-CLASS CLASSIFIERS 
-sgd = SGDClassifier(random_state=42)
-cv_sgd = cross_val_score(sgd, X_train, y_train, cv=10, scoring='accuracy')
-# print(cv_sgd, np.mean(cv_sgd))
-print('SGD', np.mean(cv_sgd))
+# sgd = SGDClassifier(random_state=42)
+# cv_sgd = cross_val_score(sgd, X_train, y_train, cv=10, scoring='accuracy')
+# # print(cv_sgd, np.mean(cv_sgd))
+# print('SGD', np.mean(cv_sgd))
 
-log_reg = LogisticRegression(random_state=42, multi_class='ovr', solver='liblinear')
-cv_log_reg = cross_val_score(log_reg, X_train, y_train, cv=5, scoring='accuracy')
-# print(cv_log_reg, np.mean(cv_log_reg))
-print('LR', np.mean(cv_log_reg))
+# log_reg = LogisticRegression(random_state=42, multi_class='ovr', solver='liblinear')
+# cv_log_reg = cross_val_score(log_reg, X_train, y_train, cv=5, scoring='accuracy')
+# # print(cv_log_reg, np.mean(cv_log_reg))
+# print('LR', np.mean(cv_log_reg))
 
 
-gnb = GaussianNB()
-cv_gnb = cross_val_score(gnb, X_train, y_train, cv=5, scoring='accuracy')
-# print(cv_gnb, np.mean(cv_gnb))
-print('NB', np.mean(cv_gnb))
+# gnb = GaussianNB()
+# cv_gnb = cross_val_score(gnb, X_train, y_train, cv=5, scoring='accuracy')
+# # print(cv_gnb, np.mean(cv_gnb))
+# print('NB', np.mean(cv_gnb))
 
-baseline = DummyClassifier(random_state=42)
-cv_baseline = cross_val_score(baseline, X_train, y_train, cv=5, scoring='accuracy')
-# print(cv_baseline, np.mean(cv_baseline))
-print("cv_baseline", np.mean(cv_baseline))
+# baseline = DummyClassifier(random_state=42)
+# cv_baseline = cross_val_score(baseline, X_train, y_train, cv=5, scoring='accuracy')
+# # print(cv_baseline, np.mean(cv_baseline))
+# print("cv_baseline", np.mean(cv_baseline))
 
-print()
+# print()
 
-from sklearn.kernel_approximation import RBFSampler
-rbf_features = RBFSampler(gamma=1, n_components=100, random_state=42)
-X_train_features = rbf_features.fit_transform(X_train)
-print(X_train_features.shape)
+# from sklearn.kernel_approximation import RBFSampler
+# rbf_features = RBFSampler(gamma=1, n_components=100, random_state=42)
+# X_train_features = rbf_features.fit_transform(X_train)
+# print(X_train_features.shape)
 
-sgd = SGDClassifier(random_state=42)
-cv_sgd = cross_val_score(sgd, X_train_features, y_train, cv=5, scoring='accuracy')
-print('cv_sgd', np.mean(cv_sgd))
+# sgd = SGDClassifier(random_state=42)
+# cv_sgd = cross_val_score(sgd, X_train_features, y_train, cv=5, scoring='accuracy')
+# print('cv_sgd', np.mean(cv_sgd))
 
-log_reg = LogisticRegression(random_state=42, multi_class='ovr', solver='liblinear')
-cv_log_reg = cross_val_score(log_reg, X_train_features, y_train, cv=5, scoring='accuracy')
-print('cv_log_reg', np.mean(cv_log_reg))
+# log_reg = LogisticRegression(random_state=42, multi_class='ovr', solver='liblinear')
+# cv_log_reg = cross_val_score(log_reg, X_train_features, y_train, cv=5, scoring='accuracy')
+# print('cv_log_reg', np.mean(cv_log_reg))
 
-gnb = GaussianNB()
-cv_gnb = cross_val_score(gnb, X_train_features, y_train, cv=5, scoring='accuracy')
-print('cv_gnb', np.mean(cv_gnb))
+# gnb = GaussianNB()
+# cv_gnb = cross_val_score(gnb, X_train_features, y_train, cv=5, scoring='accuracy')
+# print('cv_gnb', np.mean(cv_gnb))
+
+from sklearn.model_selection import GridSearchCV
+
+# specify the range of hyperparameter values for the grid search to try out 
+param_grid = {'penalty': ['l1', 'l2'], 'C': [0.25, 0.5, 1.0]}
+
+forest_reg = LogisticRegression(random_state=42, solver='liblinear', multi_class='ovr')
+grid_search = GridSearchCV(forest_reg, param_grid, cv=5,
+                          scoring="accuracy")
+grid_search.fit(X_train, y_train)
+
+print(grid_search.best_params_, grid_search.best_score_)
