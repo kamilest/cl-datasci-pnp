@@ -23,13 +23,9 @@ from sklearn.naive_bayes import GaussianNB
 from sklearn.ensemble import VotingClassifier, RandomForestClassifier
 from sklearn.svm import SVC
 
+from sklearn.ensemble import BaggingClassifier, AdaBoostClassifier, GradientBoostingClassifier
+from sklearn.tree import DecisionTreeClassifier
 
-# from sklearn.metrics import mean_squared_error
-
-# from sklearn.ensemble import BaggingClassifier
-# from sklearn.tree import DecisionTreeClassifier
-
-# from sklearn.ensemble import AdaBoostClassifier
 
 
 # from sklearn.ensemble import GradientBoostingRegressor
@@ -77,9 +73,9 @@ diabetic_num_features = ['time_in_hospital', 'num_lab_procedures','num_procedure
 
 # diabetic_num_features = ['time_in_hospital', 'num_lab_procedures','num_procedures', 'num_medications', 'number_diagnoses']
 
-diabetic_drugs = ['medical_specialty', 'metformin', 'repaglinide', 'nateglinide','chlorpropamide', 'glimepiride', 'acetohexamide', 'glipizide', 'glyburide','tolbutamide', 'pioglitazone', 'rosiglitazone', 'acarbose', 'miglitol','troglitazone', 'tolazamide', 'examide', 'citoglipton', 'insulin', 'glyburide-metformin', 'glipizide-metformin', 'glimepiride-pioglitazone','metformin-rosiglitazone', 'metformin-pioglitazone']
+# diabetic_drugs = ['medical_specialty', 'metformin', 'repaglinide', 'nateglinide','chlorpropamide', 'glimepiride', 'acetohexamide', 'glipizide', 'glyburide','tolbutamide', 'pioglitazone', 'rosiglitazone', 'acarbose', 'miglitol','troglitazone', 'tolazamide', 'examide', 'citoglipton', 'insulin', 'glyburide-metformin', 'glipizide-metformin', 'glimepiride-pioglitazone','metformin-rosiglitazone', 'metformin-pioglitazone']
 
-# diabetic_drugs = []
+diabetic_drugs = []
 
 diabetic_cat_features = ['race', 'gender', 'change', 'diabetesMed']
 diabetic_diag_features = ['diag_1', 'diag_2', 'diag_3']
@@ -164,73 +160,100 @@ print(X_train.shape)
 
 # MULTI-CLASS CLASSIFIERS 
 
-sgd = SGDClassifier(random_state=42)
-cv_sgd = cross_val_score(sgd, X_train, y_train, cv=5, scoring='accuracy')
-# print(cv_sgd, np.mean(cv_sgd))
-print('cv_sgd', np.mean(cv_sgd))
+# sgd = SGDClassifier(random_state=42)
+# cv_sgd = cross_val_score(sgd, X_train, y_train, cv=5, scoring='accuracy')
+# # print(cv_sgd, np.mean(cv_sgd))
+# print('cv_sgd', np.mean(cv_sgd))
 
-log_reg = LogisticRegression(random_state=42, multi_class='ovr', solver='liblinear')
-cv_log_reg = cross_val_score(log_reg, X_train, y_train, cv=5, scoring='accuracy')
-# print(cv_log_reg, np.mean(cv_log_reg))
-print('cv_log_reg', np.mean(cv_log_reg))
-
-
-gnb = GaussianNB()
-cv_gnb = cross_val_score(gnb, X_train, y_train, cv=5, scoring='accuracy')
-# print(cv_gnb, np.mean(cv_gnb))
-print('cv_gnb', np.mean(cv_gnb))
-
-baseline = DummyClassifier(random_state=42)
-cv_baseline = cross_val_score(baseline, X_train, y_train, cv=5, scoring='accuracy')
-# print(cv_baseline, np.mean(cv_baseline))
-print("cv_baseline", np.mean(cv_baseline))
-
-print()
+# log_reg = LogisticRegression(random_state=42, multi_class='ovr', solver='liblinear')
+# cv_log_reg = cross_val_score(log_reg, X_train, y_train, cv=5, scoring='accuracy')
+# # print(cv_log_reg, np.mean(cv_log_reg))
+# print('cv_log_reg', np.mean(cv_log_reg))
 
 
-# KERNEL TRICK 
+# gnb = GaussianNB()
+# cv_gnb = cross_val_score(gnb, X_train, y_train, cv=5, scoring='accuracy')
+# # print(cv_gnb, np.mean(cv_gnb))
+# print('cv_gnb', np.mean(cv_gnb))
 
-from sklearn.kernel_approximation import RBFSampler
-rbf_features = RBFSampler(gamma=1, n_components=100, random_state=42)
-X_train_features = rbf_features.fit_transform(X_train)
-print(X_train_features.shape)
+# baseline = DummyClassifier(random_state=42)
+# cv_baseline = cross_val_score(baseline, X_train, y_train, cv=5, scoring='accuracy')
+# # print(cv_baseline, np.mean(cv_baseline))
+# print("cv_baseline", np.mean(cv_baseline))
 
-sgd = SGDClassifier(random_state=42)
-cv_sgd = cross_val_score(sgd, X_train_features, y_train, cv=5, scoring='accuracy')
-print('cv_sgd', np.mean(cv_sgd))
+# print()
 
-log_reg = LogisticRegression(random_state=42, multi_class='ovr', solver='liblinear')
-cv_log_reg = cross_val_score(log_reg, X_train_features, y_train, cv=5, scoring='accuracy')
-print('cv_log_reg', np.mean(cv_log_reg))
 
-gnb = GaussianNB()
-cv_gnb = cross_val_score(gnb, X_train_features, y_train, cv=5, scoring='accuracy')
-print('cv_gnb', np.mean(cv_gnb))
+# # KERNEL TRICK 
 
-print()
+# from sklearn.kernel_approximation import RBFSampler
+# rbf_features = RBFSampler(gamma=1, n_components=100, random_state=42)
+# X_train_features = rbf_features.fit_transform(X_train)
+# print(X_train_features.shape)
 
-# GRID SEARCH
+# sgd = SGDClassifier(random_state=42)
+# cv_sgd = cross_val_score(sgd, X_train_features, y_train, cv=5, scoring='accuracy')
+# print('cv_sgd', np.mean(cv_sgd))
 
-# specify the range of hyperparameter values for the grid search to try out 
-param_grid = {'penalty': ['l1', 'l2'], 'C': [0.25, 0.5, 1.0]}
+# log_reg = LogisticRegression(random_state=42, multi_class='ovr', solver='liblinear')
+# cv_log_reg = cross_val_score(log_reg, X_train_features, y_train, cv=5, scoring='accuracy')
+# print('cv_log_reg', np.mean(cv_log_reg))
 
-forest_reg = LogisticRegression(random_state=42, solver='liblinear', multi_class='ovr')
-grid_search = GridSearchCV(forest_reg, param_grid, cv=5,
-                          scoring="accuracy")
-grid_search.fit(X_train, y_train)
+# gnb = GaussianNB()
+# cv_gnb = cross_val_score(gnb, X_train_features, y_train, cv=5, scoring='accuracy')
+# print('cv_gnb', np.mean(cv_gnb))
 
-print(grid_search.best_params_, grid_search.best_score_)
+# print()
 
-print()
+# # GRID SEARCH
 
-log_clf = LogisticRegression(random_state=42, multi_class='ovr', solver='liblinear')
-rnd_clf = RandomForestClassifier(random_state=42, n_estimators=100)
-svm_clf = SVC(random_state=42, gamma='scale')
+# # specify the range of hyperparameter values for the grid search to try out 
+# param_grid = {'penalty': ['l1', 'l2'], 'C': [0.25, 0.5, 1.0]}
 
-voting_clf = VotingClassifier(
-    estimators=[('lr', log_clf), ('rf', rnd_clf), ('svc', svm_clf)],
-    voting='hard')
+# forest_reg = LogisticRegression(random_state=42, solver='liblinear', multi_class='ovr')
+# grid_search = GridSearchCV(forest_reg, param_grid, cv=5,
+#                           scoring="accuracy")
+# grid_search.fit(X_train, y_train)
 
-cv_voting = cross_val_score(voting_clf, X_train, y_train, cv=5, scoring="accuracy")
-print('cv_voting', np.mean(cv_voting))
+# print(grid_search.best_params_, grid_search.best_score_)
 
+# print()
+
+# log_clf = LogisticRegression(random_state=42, multi_class='ovr', solver='liblinear')
+# rnd_clf = RandomForestClassifier(random_state=42, n_estimators=100)
+# svm_clf = SVC(random_state=42, gamma='scale')
+
+# voting_clf = VotingClassifier(
+#     estimators=[('lr', log_clf), ('rf', rnd_clf), ('svc', svm_clf)],
+#     voting='hard')
+
+# cv_voting = cross_val_score(voting_clf, X_train, y_train, cv=5, scoring="accuracy")
+# print('cv_voting', np.mean(cv_voting))
+
+
+# BAGGING AND PASTING ENSEMBLES
+
+# Random Forest Classifier 
+# (BaggingClassifier with DecisionTreeClassifier as base)
+
+rnd_clf = RandomForestClassifier(n_estimators=500, max_leaf_nodes=16, 
+                                 n_jobs=-1, random_state=42, oob_score=True)
+rnd_clf.fit(X_train, y_train)
+cv_rnd_clf = cross_val_score(rnd_clf, X_train, y_train, cv=5, scoring="accuracy")
+print('cv_rnd_clf', np.mean(cv_rnd_clf), '(oob score {})'.format(rnd_clf.oob_score_))
+
+
+ada_clf = AdaBoostClassifier(
+    DecisionTreeClassifier(max_depth=1), n_estimators=200,
+    algorithm="SAMME.R", learning_rate=0.5, random_state=42)
+cv_ada_clf = cross_val_score(ada_clf, X_train, y_train, cv=5, scoring="accuracy")
+print('cv_ada_clf', np.mean(cv_ada_clf))
+
+# gb_clf = GradientBoostingClassifier(max_depth=10, n_estimators=100, learning_rate=0.1, random_state=42)
+# cv_gb_clf = cross_val_score(gb_clf, X_train, y_train, cv=5, scoring="accuracy")
+# print('cv_gb_clf', np.mean(cv_gb_clf))
+
+# early stopping
+gbes_clf = GradientBoostingClassifier(max_depth=10, validation_fraction=0.1, n_iter_no_change=10, tol=0.01, n_estimators=100, learning_rate=0.1, random_state=42)
+cv_gbes_clf = cross_val_score(gbes_clf, X_train, y_train, cv=5, scoring="accuracy")
+print('cv_gbes_clf', np.mean(cv_gbes_clf))
