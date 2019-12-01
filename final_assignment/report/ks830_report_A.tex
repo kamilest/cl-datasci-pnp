@@ -81,17 +81,7 @@ Kamilė Stankevičiūtė (\texttt{ks830}) \\ Gonville \& Caius College
 
 \section{Data exploration}
 
-I examine the dataset of medical care records of diabetic patients over a period of 10 years (1999-2008), as presented in a given sample \textit{diabetic\_data\_balanced.csv}. 
-
-\subsection{Preprocessing}
-
-\paragraph{Anonymisation} Some patients have multiple encounter records (up to 15 per patient). This might skew the results of further analysis (whether exploration or classification) as models might learn to identify particular patients (through patient number or otherwise). For this reason at most one randomly sampled encounter per patient will be included in further analysis, and patient and encounter numbers removed. This leaves 7944 unique instances.
-
-\paragraph{Missing values} The dataset has several features with missing values, most notably weight (97.0\%), payer code (97.6\%), and medical specialty (36.3\%). The first two will be excluded from further analysis. After comparing the numerical feature distributions for missing and non-missing medical specialty values, I will assume that the values are missing at random and replace them (as well as the other missing categorical feature values) with a separate category. There seems to be no numerical feature values missing.
-
-\paragraph{Categorical features} For the machine learning task, I will encode most categorical features using one-hot encoding. However, in some cases I think it is reasonable to represent the relative ordering of values. I will therefore transform the age intervals to integers, and split the glucose and A1c tests into two variables: a boolean for whether the test was taken, and the ordered values of the test results otherwise.
-
-\paragraph{Train and test split} I chose 90\%/10\% stratified train/test split with 7149 train and 795 test instances.
+I examine the dataset of medical care records of diabetic patients over a period of 10 years (1999-2008), as presented in a given sample \textit{diabetic\_data\_balanced.csv}. This analysis has been done on `anonymised' data as described in the next section.
 
 \subsection{Patient demographics}
 
@@ -110,6 +100,8 @@ First I examine patient demographic data. The first part of Figure \ref{genderag
     \end{subfigure}
 	\caption{Patient age distributions categorised by outcome and gender.}\label{genderagecountreadmitted}
 \end{figure}
+Generally, more adult patients are readmitted than not, and we can observe that patients from the age of 60 have higher occurrence of `<30' label compared to `>30', indicating that they are more likely to be readmitted sooner.
+
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=\linewidth]{figures/gender_age_count.png}
@@ -122,11 +114,7 @@ First I examine patient demographic data. The first part of Figure \ref{genderag
   \end{figure*}
 \newpage
 
-Generally, more adult patients are readmitted than not, and we can observe that patients from the age of 60 have higher occurrence of `<30' label compared to `>30', indicating that they are more likely to be readmitted sooner.
-
 Further categorising by gender (bottom part of Figure \ref{genderagecountreadmitted}), we can see that the readmission frequency increases earlier for female patients, where the relative occurrence of `<30' and `>30' changes at 60-70 rather than 70-80 years old. In general, we can see that for female patients both the absolute (compared to male) and relative (compared to younger female) admission numbers get higher with increased age, which can be also seen in Figure \ref{genderagecount}. This might suggest the longer lifespan of female patients.
-
-
 
 \subsection{Relationship between the type of treatment and readmission}
 
@@ -147,6 +135,18 @@ The higher number of diagnoses is associated with the likelihood of readmission 
 The main focus of this dataset is the readmission outcomes for diabetic patients, and their relationship to diabetes-specific treatment.
 
 \section{Machine learning algorithms implementation}
+
+\subsection{Preprocessing}
+
+\paragraph{Anonymisation} Some patients have multiple encounter records (up to 15 per patient). This might skew the results of further analysis (whether exploration or classification) as models might learn to identify particular patients (through patient number or otherwise). For this reason at most one randomly sampled encounter per patient will be included in further analysis, and patient and encounter numbers removed. This leaves 7944 unique instances.
+
+\paragraph{Missing values} The dataset has several features with missing values, most notably weight (97.0\%), payer code (97.6\%), and medical specialty (36.3\%). The first two will be excluded from further analysis. After comparing the numerical feature distributions for missing and non-missing medical specialty values, I will assume that the values are missing at random and replace them (as well as the other missing categorical feature values) with a separate category. There seems to be no numerical feature values missing.
+
+\paragraph{Numerical features} TODO
+
+\paragraph{Categorical features} For the machine learning task, I will encode most categorical features using one-hot encoding. However, in some cases I think it is reasonable to represent the relative ordering of values. I will therefore transform the age intervals to integers, and split the glucose and A1c tests into two variables: a boolean for whether the test was taken, and the ordered values of the test results otherwise.
+
+\paragraph{Train and test split} I chose 90\%/10\% stratified train/test split with 7149 train and 795 test instances.
 
 \section{Evaluation}
 
