@@ -24,6 +24,8 @@
 \graphicspath{{figures/}}
 \usepackage{subcaption}
 
+\usepackage{tabularx}
+
 \usepackage{hyperref}
 \urlstyle{same}
 
@@ -154,11 +156,30 @@ The main focus of this dataset is the readmission outcomes for diabetic patients
 
 \paragraph{Missing values} The dataset has several features with missing values, most notably weight (97.0\%), payer code (97.6\%), and medical specialty (36.3\%). The first two will be excluded from further analysis. After comparing the numerical feature distributions for missing and non-missing medical specialty values, I will assume that the values are missing at random and replace them (as well as the other missing categorical feature values) with a separate category. There seems to be no numerical feature values missing.
 
-\paragraph{Numerical features} Some features, such as admission source, type, and discharge identifiers should be numeric as the values should not have any ordering associated with them. I will convert those features to one-hot-endocded vectors. Otherwise numerical features will be normalised.
+\paragraph{Numerical features} Some features, such as admission source, type, and discharge identifiers should be categorical as those values should not have any ordering associated with them. I will convert those features to one-hot-encoded vectors. Other numerical features will be normalised.
 
-\paragraph{Categorical features} For the machine learning task, I will encode most categorical features using one-hot encoding. However, in some cases I think it is reasonable to represent the relative ordering of values. I will therefore transform the age intervals to integers, and split the glucose and A1c tests into two variables: a boolean for whether the test was taken, and the ordered values of the test results otherwise.
+\paragraph{Categorical features} For most categorical features I will be using one-hot encoding. However, to represent the order of age categories, I will encode the age feature as integers.
 
 \paragraph{Train and test split} I chose 90\%/10\% stratified train/test split with 7149 train and 795 test instances.
+
+\subsection{Simple multi-class classifiers}
+Prediction of three readmission outcome labels is an instance of a multi-class classification task. I implement the multi-class \textit{Naive Bayes} classifier, \textit{stochastic gradient descent} and \textit{logistic regression} classifiers (using \textit{one-vs-all} strategy where appropriate).
+
+5-fold cross-validation gave the best mean accuracy results for \texttt{LogisticRegression} classifier with mean accuracy of 50.4\%. All three classifiers performed better than the baseline mean accuracy (random guessing based on label distribution) of 34.2\% (Table \ref{multiclass}). 
+
+\begin{table}[]
+	\begin{tabularx}{\linewidth}{XXXX}
+		\hline
+		\textbf{Baseline} & \textbf{NB} & \textbf{Log. reg.} & \textbf{SGD} \\ \hline
+		34.2\%            & 38.0\%               & 50.4\%                       & 48.2\%                 \\ \hline
+		\end{tabularx}
+\caption{Mean cross-validation accuracies for selected multi-class classifiers.}\label{multiclass}
+\end{table}
+
+
+\subsection{Ensemble models}
+
+
 
 \section{Evaluation}
 
