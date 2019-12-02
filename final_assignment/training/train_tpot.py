@@ -143,7 +143,11 @@ print(X_train.shape)
 tpot_clf = TPOTClassifier(generations=5, population_size=20, cv=5, random_state=42, verbosity=2)
 
 tpot_clf.fit(X_train, y_train)
-print(tpot_clf.score(X_train, y_train))
 
-cv_tpot_clf = cross_val_score(tpot_clf, X_train, y_train, cv=5, scoring="accuracy")
-print('cv_tpot_clf', np.mean(cv_tpot_clf))
+# Generation 1 - Current best internal CV score: 0.5512705517485216
+# Generation 2 - Current best internal CV score: 0.5512705517485216
+# Generation 3 - Current best internal CV score: 0.5512705517485216
+# Generation 4 - Current best internal CV score: 0.5537878398884247
+# Generation 5 - Current best internal CV score: 0.5537878398884247
+
+# Best pipeline: GradientBoostingClassifier(input_matrix, learning_rate=0.01, max_depth=10, max_features=0.2, min_samples_leaf=1, min_samples_split=14, n_estimators=100, subsample=0.9000000000000001)
