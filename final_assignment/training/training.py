@@ -205,7 +205,7 @@ print(X_train.shape)
 
 # print()
 
-# # GRID SEARCH
+# # GRID SEARCH LOGISTIC REGRESSION
 
 # # specify the range of hyperparameter values for the grid search to try out 
 # param_grid = {'penalty': ['l1', 'l2'], 'C': [0.25, 0.5, 1.0]}
@@ -236,24 +236,41 @@ print(X_train.shape)
 # Random Forest Classifier 
 # (BaggingClassifier with DecisionTreeClassifier as base)
 
-rnd_clf = RandomForestClassifier(n_estimators=500, max_leaf_nodes=16, 
-                                 n_jobs=-1, random_state=42, oob_score=True)
-rnd_clf.fit(X_train, y_train)
-cv_rnd_clf = cross_val_score(rnd_clf, X_train, y_train, cv=5, scoring="accuracy")
-print('cv_rnd_clf', np.mean(cv_rnd_clf), '(oob score {})'.format(rnd_clf.oob_score_))
+# rnd_clf = RandomForestClassifier(n_estimators=500, max_leaf_nodes=16, 
+#                                  n_jobs=-1, random_state=42, oob_score=True)
+# rnd_clf.fit(X_train, y_train)
+# cv_rnd_clf = cross_val_score(rnd_clf, X_train, y_train, cv=5, scoring="accuracy")
+# print('cv_rnd_clf', np.mean(cv_rnd_clf), '(oob score {})'.format(rnd_clf.oob_score_))
 
 
-ada_clf = AdaBoostClassifier(
-    DecisionTreeClassifier(max_depth=1), n_estimators=200,
-    algorithm="SAMME.R", learning_rate=0.5, random_state=42)
-cv_ada_clf = cross_val_score(ada_clf, X_train, y_train, cv=5, scoring="accuracy")
-print('cv_ada_clf', np.mean(cv_ada_clf))
+# ADABOOST CLASSIFIER
+
+# ada_clf = AdaBoostClassifier(
+#     DecisionTreeClassifier(max_depth=1), n_estimators=200,
+#     algorithm="SAMME.R", learning_rate=0.5, random_state=42)
+# cv_ada_clf = cross_val_score(ada_clf, X_train, y_train, cv=5, scoring="accuracy")
+# print('cv_ada_clf', np.mean(cv_ada_clf))
+
+# GRADIENT BOOSTING
 
 # gb_clf = GradientBoostingClassifier(max_depth=10, n_estimators=100, learning_rate=0.1, random_state=42)
 # cv_gb_clf = cross_val_score(gb_clf, X_train, y_train, cv=5, scoring="accuracy")
 # print('cv_gb_clf', np.mean(cv_gb_clf))
 
+
+# GRADIENT BOOSTING WITH EARLY STOPPING
+
 # early stopping
-gbes_clf = GradientBoostingClassifier(max_depth=10, validation_fraction=0.1, n_iter_no_change=10, tol=0.01, n_estimators=100, learning_rate=0.1, random_state=42)
-cv_gbes_clf = cross_val_score(gbes_clf, X_train, y_train, cv=5, scoring="accuracy")
-print('cv_gbes_clf', np.mean(cv_gbes_clf))
+# gbes_clf = GradientBoostingClassifier(max_depth=10, validation_fraction=0.1, n_iter_no_change=10, tol=0.01, n_estimators=100, learning_rate=0.1, random_state=42)
+# cv_gbes_clf = cross_val_score(gbes_clf, X_train, y_train, cv=5, scoring="accuracy")
+# print('cv_gbes_clf', np.mean(cv_gbes_clf))
+
+# AUTOML PIPELINE FOR HYPERPARAMETER TUNING
+
+tpot_best_clf = GradientBoostingClassifier(learning_rate=0.01, max_depth=10, max_features=0.2, min_samples_leaf=1, min_samples_split=14, n_estimators=100, subsample=0.9000000000000001, random_state=42)
+
+cv_tpot_best_clf = cross_val_score(tpot_best_clf, X_train, y_train, cv=5, scoring="accuracy")
+print('cv_tpot_best_clf', np.mean(cv_tpot_best_clf))
+
+
+
