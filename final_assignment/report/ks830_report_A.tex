@@ -162,6 +162,8 @@ The main focus of this dataset is the readmission outcomes for diabetic patients
 
 \paragraph{Missing values} The dataset has several features with missing values, most notably weight (97.0\%), payer code (97.6\%), and medical specialty (36.3\%). The first two will be excluded from further analysis. After comparing the numerical feature distributions for missing and non-missing medical specialty values, I will assume that the values are missing at random and replace them (as well as the other missing categorical feature values) with a separate category. There seems to be no numerical feature values missing.
 
+\paragraph{Unknown values} It is possible that some categories present in the testing set are not present in training set, which may cause errors in one-hot-encoding pipeline. I set the parameters of one-hot encoder to ignore such errors, which returns zero- rather than one-hot vector, but the number of features in total stays the same.
+
 \paragraph{Numerical features} Some features, such as admission source, type, and discharge identifiers should be categorical as those values should not have any ordering associated with them. I will convert those features to one-hot-encoded vectors. Other numerical features will be normalised.
 
 \paragraph{Categorical features} For most categorical features I will be using one-hot encoding. However, to represent the relative order of age categories, I will encode the age feature with consecutive integers and normalise them.
@@ -175,7 +177,7 @@ The main focus of this dataset is the readmission outcomes for diabetic patients
 \subsection{Simple multi-class classifiers}
 Prediction of three readmission outcome labels is an instance of a multi-class classification task. I implement the multi-class \textit{Naive Bayes} (NB), \textit{stochastic gradient descent} (SGD) and \textit{logistic regression}  (LogReg) classifiers (using \textit{one-vs-all} strategy where appropriate).
 
-\paragraph{Results} The results are generally better for the reduced feature set, where 5-fold cross-validation gave the best results for the logistic regression classifier (mean accuracy 53.4\%). All three classifiers performed better than the baseline mean accuracy (random guessing based on label distribution) of 33.3\% (Table \ref{multiclass}). The reduced feature set generally worked better, although not by much – these results, especially for logistic regression, could be subject to randomness.
+\paragraph{Results} The results are generally better for the reduced feature set, where 5-fold cross-validation gave the best results for the logistic regression classifier (mean accuracy 53.4\%). All three classifiers performed better than the baseline mean accuracy (random guessing based on label distribution) of 33.3\% (Table \ref{multiclass}). The reduced feature set generally worked better, although not by much – these results, especially for logistic regression, are likely to be subject to noise.
 
 \paragraph{Grid search} Further grid search on regularisation parameters and regularisation strength increased the mean cross-validation accuracy of logistic regression classifier to 53.9\% for both full and reduced feature sets.
 
@@ -211,11 +213,11 @@ For ensemble models, I have implemented the following:
 	\caption{Mean training set cross-validation accuracies for voting, bagging, adaptive boosting and gradient boosting ensembles, trained on full and reduced feature sets. \textit{Out-of-bag scores are reported for the bagging classifier}.}\label{ensemble}
 \end{table}
 
-\paragraph{Results} The results are presented in Table \ref{ensemble}, with out-of-bag scores for the bagging classifier as these give a better performance estimate. Generally results are similar between ensemble techniques and feature sets since the differences in accuracies are small and vary depending on the technique chosen. The highest result in this comparison was for the voting classifier which gave the accuracy of 54.7\% for the full feature set.
+\paragraph{Results} The results are presented in Table \ref{ensemble}, with out-of-bag scores for the bagging classifier as these give a better performance estimate. Generally results are similar between ensemble techniques and feature sets since the differences in accuracies are small and vary depending on the technique chosen. The highest result in this comparison was for the voting classifier which gave the mean cross-validation accuracy of 54.7\% for the full feature set.
 
 
 \paragraph{Tuning}
-Further hyperparameter search using automated machine learning tools gave the gradient boosting classifier with accuracy boosted to 54.8\% on the full feature set and \textbf{55.4\% on the reduced feature set}. Since this is the best cross-validation accuracy among all classifiers I will use this model for further evaluation.
+Further hyperparameter search using automated machine learning tools boosted the accuracy of the gradient boosting classifier to 54.8\% on the full feature set and \textbf{55.4\% on the reduced feature set}. Since this is the best cross-validation accuracy among all classifiers I will use this model for further evaluation.
 
 \section{Evaluation}
 
