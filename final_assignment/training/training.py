@@ -26,16 +26,6 @@ from sklearn.svm import SVC
 from sklearn.ensemble import BaggingClassifier, AdaBoostClassifier, GradientBoostingClassifier
 from sklearn.tree import DecisionTreeClassifier
 
-
-
-# from sklearn.ensemble import GradientBoostingRegressor
-
-# import sklearn.linear_model
-# import scipy.optimize
-# import sklearn.decomposition
-# import sklearn.manifold
-# import sklearn.model_selection
-
 class DataFrameSelector(BaseEstimator, TransformerMixin):
     def __init__(self, attribute_names):
         self.attribute_names = attribute_names
@@ -61,8 +51,6 @@ for train_index, test_index in split.split(X, y):
      X_train, X_test = X.iloc[train_index], X.iloc[test_index]
      y_train, y_test = y.iloc[train_index], y.iloc[test_index]
     
-# diabetic_features = strat_train_set.drop("readmitted", axis=1)
-# diabetic_labels = strat_train_set["readmitted"].copy()
 
 # PREPROCESSING PIPELINE
 diabetic_num_to_cat_features = ['admission_type_id', 'discharge_disposition_id','admission_source_id']
@@ -71,7 +59,9 @@ diabetic_cat_to_num_features = ['max_glu_serum', 'A1Cresult']
 
 diabetic_num_features = ['time_in_hospital', 'num_lab_procedures','num_procedures', 'num_medications', 'number_outpatient', 'number_emergency', 'number_inpatient', 'number_diagnoses']
 
-# diabetic_num_features = ['time_in_hospital', 'num_lab_procedures','num_procedures', 'num_medications', 'number_diagnoses']
+
+# CHANGE DIABETIC DRUGS TO EITHER FULL AND EMPTY ARRAY
+# FOR FULL AND REDUCED FEATURE SETS
 
 # diabetic_drugs = ['medical_specialty', 'metformin', 'repaglinide', 'nateglinide','chlorpropamide', 'glimepiride', 'acetohexamide', 'glipizide', 'glyburide','tolbutamide', 'pioglitazone', 'rosiglitazone', 'acarbose', 'miglitol','troglitazone', 'tolazamide', 'examide', 'citoglipton', 'insulin', 'glyburide-metformin', 'glipizide-metformin', 'glimepiride-pioglitazone','metformin-rosiglitazone', 'metformin-pioglitazone']
 
@@ -160,75 +150,72 @@ print(X_train.shape)
 
 # MULTI-CLASS CLASSIFIERS 
 
-# sgd = SGDClassifier(random_state=42)
-# cv_sgd = cross_val_score(sgd, X_train, y_train, cv=5, scoring='accuracy')
-# # print(cv_sgd, np.mean(cv_sgd))
-# print('cv_sgd', np.mean(cv_sgd))
+sgd = SGDClassifier(random_state=42)
+cv_sgd = cross_val_score(sgd, X_train, y_train, cv=5, scoring='accuracy')
+# print(cv_sgd, np.mean(cv_sgd))
+print('cv_sgd', np.mean(cv_sgd))
 
-# log_reg = LogisticRegression(random_state=42, multi_class='ovr', solver='liblinear')
-# cv_log_reg = cross_val_score(log_reg, X_train, y_train, cv=5, scoring='accuracy')
-# # print(cv_log_reg, np.mean(cv_log_reg))
-# print('cv_log_reg', np.mean(cv_log_reg))
-
-
-# gnb = GaussianNB()
-# cv_gnb = cross_val_score(gnb, X_train, y_train, cv=5, scoring='accuracy')
-# # print(cv_gnb, np.mean(cv_gnb))
-# print('cv_gnb', np.mean(cv_gnb))
-
-# baseline = DummyClassifier(random_state=42)
-# cv_baseline = cross_val_score(baseline, X_train, y_train, cv=5, scoring='accuracy')
-# # print(cv_baseline, np.mean(cv_baseline))
-# print("cv_baseline", np.mean(cv_baseline))
-
-# print()
+log_reg = LogisticRegression(random_state=42, multi_class='ovr', solver='liblinear')
+cv_log_reg = cross_val_score(log_reg, X_train, y_train, cv=5, scoring='accuracy')
+# print(cv_log_reg, np.mean(cv_log_reg))
+print('cv_log_reg', np.mean(cv_log_reg))
 
 
-# # KERNEL TRICK 
+gnb = GaussianNB()
+cv_gnb = cross_val_score(gnb, X_train, y_train, cv=5, scoring='accuracy')
+# print(cv_gnb, np.mean(cv_gnb))
+print('cv_gnb', np.mean(cv_gnb))
 
-# from sklearn.kernel_approximation import RBFSampler
-# rbf_features = RBFSampler(gamma=1, n_components=100, random_state=42)
-# X_train_features = rbf_features.fit_transform(X_train)
-# print(X_train_features.shape)
+baseline = DummyClassifier(random_state=42)
+cv_baseline = cross_val_score(baseline, X_train, y_train, cv=5, scoring='accuracy')
+# print(cv_baseline, np.mean(cv_baseline))
+print("cv_baseline", np.mean(cv_baseline))
 
-# sgd = SGDClassifier(random_state=42)
-# cv_sgd = cross_val_score(sgd, X_train_features, y_train, cv=5, scoring='accuracy')
-# print('cv_sgd', np.mean(cv_sgd))
+# KERNEL TRICK 
 
-# log_reg = LogisticRegression(random_state=42, multi_class='ovr', solver='liblinear')
-# cv_log_reg = cross_val_score(log_reg, X_train_features, y_train, cv=5, scoring='accuracy')
-# print('cv_log_reg', np.mean(cv_log_reg))
+from sklearn.kernel_approximation import RBFSampler
+rbf_features = RBFSampler(gamma=1, n_components=100, random_state=42)
+X_train_features = rbf_features.fit_transform(X_train)
+print(X_train_features.shape)
 
-# gnb = GaussianNB()
-# cv_gnb = cross_val_score(gnb, X_train_features, y_train, cv=5, scoring='accuracy')
-# print('cv_gnb', np.mean(cv_gnb))
+sgd = SGDClassifier(random_state=42)
+cv_sgd = cross_val_score(sgd, X_train_features, y_train, cv=5, scoring='accuracy')
+print('cv_sgd', np.mean(cv_sgd))
 
-# print()
+log_reg = LogisticRegression(random_state=42, multi_class='ovr', solver='liblinear')
+cv_log_reg = cross_val_score(log_reg, X_train_features, y_train, cv=5, scoring='accuracy')
+print('cv_log_reg', np.mean(cv_log_reg))
 
-# # GRID SEARCH LOGISTIC REGRESSION
+gnb = GaussianNB()
+cv_gnb = cross_val_score(gnb, X_train_features, y_train, cv=5, scoring='accuracy')
+print('cv_gnb', np.mean(cv_gnb))
 
-# # specify the range of hyperparameter values for the grid search to try out 
-# param_grid = {'penalty': ['l1', 'l2'], 'C': [0.25, 0.5, 1.0]}
 
-# forest_reg = LogisticRegression(random_state=42, solver='liblinear', multi_class='ovr')
-# grid_search = GridSearchCV(forest_reg, param_grid, cv=5,
-#                           scoring="accuracy")
-# grid_search.fit(X_train, y_train)
+# GRID SEARCH LOGISTIC REGRESSION
+# specify the range of hyperparameter values for the grid search to try out 
 
-# print(grid_search.best_params_, grid_search.best_score_)
+param_grid = {'penalty': ['l1', 'l2'], 'C': [0.25, 0.5, 1.0]}
 
-# print()
+forest_reg = LogisticRegression(random_state=42, solver='liblinear', multi_class='ovr')
+grid_search = GridSearchCV(forest_reg, param_grid, cv=5,
+                          scoring="accuracy")
+grid_search.fit(X_train, y_train)
 
-# log_clf = LogisticRegression(random_state=42, multi_class='ovr', solver='liblinear')
-# rnd_clf = RandomForestClassifier(random_state=42, n_estimators=100)
-# svm_clf = SVC(random_state=42, gamma='scale')
+print(grid_search.best_params_, grid_search.best_score_)
 
-# voting_clf = VotingClassifier(
-#     estimators=[('lr', log_clf), ('rf', rnd_clf), ('svc', svm_clf)],
-#     voting='hard')
 
-# cv_voting = cross_val_score(voting_clf, X_train, y_train, cv=5, scoring="accuracy")
-# print('cv_voting', np.mean(cv_voting))
+# VOTING CLASSIFIER
+
+log_clf = LogisticRegression(random_state=42, multi_class='ovr', solver='liblinear')
+rnd_clf = RandomForestClassifier(random_state=42, n_estimators=100)
+svm_clf = SVC(random_state=42, gamma='scale')
+
+voting_clf = VotingClassifier(
+    estimators=[('lr', log_clf), ('rf', rnd_clf), ('svc', svm_clf)],
+    voting='hard')
+
+cv_voting = cross_val_score(voting_clf, X_train, y_train, cv=5, scoring="accuracy")
+print('cv_voting', np.mean(cv_voting))
 
 
 # BAGGING AND PASTING ENSEMBLES
@@ -236,34 +223,41 @@ print(X_train.shape)
 # Random Forest Classifier 
 # (BaggingClassifier with DecisionTreeClassifier as base)
 
-# rnd_clf = RandomForestClassifier(n_estimators=500, max_leaf_nodes=16, 
-#                                  n_jobs=-1, random_state=42, oob_score=True)
-# rnd_clf.fit(X_train, y_train)
-# cv_rnd_clf = cross_val_score(rnd_clf, X_train, y_train, cv=5, scoring="accuracy")
-# print('cv_rnd_clf', np.mean(cv_rnd_clf), '(oob score {})'.format(rnd_clf.oob_score_))
+rnd_clf = RandomForestClassifier(n_estimators=500, max_leaf_nodes=16, 
+                                 n_jobs=-1, random_state=42, oob_score=True)
+rnd_clf.fit(X_train, y_train)
+cv_rnd_clf = cross_val_score(rnd_clf, X_train, y_train, cv=5, scoring="accuracy")
+print('cv_rnd_clf', np.mean(cv_rnd_clf), '(oob score {})'.format(rnd_clf.oob_score_))
+
+
+rnd_clf_pasting = RandomForestClassifier(n_estimators=500, max_leaf_nodes=16, 
+                                 n_jobs=-1, random_state=42, bootstrap=False)
+rnd_clf_pasting.fit(X_train, y_train)
+cv_rnd_clf_pasting = cross_val_score(rnd_clf_pasting, X_train, y_train, cv=5, scoring="accuracy")
+print('cv_rnd_clf_pasting', np.mean(cv_rnd_clf_pasting))
 
 
 # ADABOOST CLASSIFIER
 
-# ada_clf = AdaBoostClassifier(
-#     DecisionTreeClassifier(max_depth=1), n_estimators=200,
-#     algorithm="SAMME.R", learning_rate=0.5, random_state=42)
-# cv_ada_clf = cross_val_score(ada_clf, X_train, y_train, cv=5, scoring="accuracy")
-# print('cv_ada_clf', np.mean(cv_ada_clf))
+ada_clf = AdaBoostClassifier(
+    DecisionTreeClassifier(max_depth=1), n_estimators=200,
+    algorithm="SAMME.R", learning_rate=0.5, random_state=42)
+cv_ada_clf = cross_val_score(ada_clf, X_train, y_train, cv=5, scoring="accuracy")
+print('cv_ada_clf', np.mean(cv_ada_clf))
 
 # GRADIENT BOOSTING
 
-# gb_clf = GradientBoostingClassifier(max_depth=10, n_estimators=100, learning_rate=0.1, random_state=42)
-# cv_gb_clf = cross_val_score(gb_clf, X_train, y_train, cv=5, scoring="accuracy")
-# print('cv_gb_clf', np.mean(cv_gb_clf))
+gb_clf = GradientBoostingClassifier(max_depth=10, n_estimators=100, learning_rate=0.1, random_state=42)
+cv_gb_clf = cross_val_score(gb_clf, X_train, y_train, cv=5, scoring="accuracy")
+print('cv_gb_clf', np.mean(cv_gb_clf))
 
 
 # GRADIENT BOOSTING WITH EARLY STOPPING
 
 # early stopping
-# gbes_clf = GradientBoostingClassifier(max_depth=10, validation_fraction=0.1, n_iter_no_change=10, tol=0.01, n_estimators=100, learning_rate=0.1, random_state=42)
-# cv_gbes_clf = cross_val_score(gbes_clf, X_train, y_train, cv=5, scoring="accuracy")
-# print('cv_gbes_clf', np.mean(cv_gbes_clf))
+gbes_clf = GradientBoostingClassifier(max_depth=10, validation_fraction=0.1, n_iter_no_change=10, tol=0.01, n_estimators=100, learning_rate=0.1, random_state=42)
+cv_gbes_clf = cross_val_score(gbes_clf, X_train, y_train, cv=5, scoring="accuracy")
+print('cv_gbes_clf', np.mean(cv_gbes_clf))
 
 # AUTOML PIPELINE FOR HYPERPARAMETER TUNING
 
