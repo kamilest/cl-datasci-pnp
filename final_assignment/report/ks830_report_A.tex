@@ -150,9 +150,13 @@ The higher number of diagnoses is associated with the likelihood of readmission 
 \subsection{Relationship between diabetes conditions and readmission}
 The main focus of this dataset is the readmission outcomes for diabetic patients, and their relationship to diabetes-specific treatment.
 
+\LARGE{TODO}
+
+\normalsize
+
 \section{Machine learning algorithms implementation}
 
-\subsection{Preprocessing}
+\subsection{Preprocessing and design choices}
 
 \paragraph{Anonymisation} Some patients have multiple encounter records (up to 15 per patient). This might skew the results of further analysis (whether exploration or classification) as models might learn to identify particular patients (through patient number or otherwise). For this reason at most one randomly sampled encounter per patient will be included in further analysis, and patient and encounter numbers removed. This leaves 7944 unique instances.
 
@@ -160,35 +164,61 @@ The main focus of this dataset is the readmission outcomes for diabetic patients
 
 \paragraph{Numerical features} Some features, such as admission source, type, and discharge identifiers should be categorical as those values should not have any ordering associated with them. I will convert those features to one-hot-encoded vectors. Other numerical features will be normalised.
 
-\paragraph{Categorical features} For most categorical features I will be using one-hot encoding. However, to represent the order of age categories, I will encode the age feature as integers.
+\paragraph{Categorical features} For most categorical features I will be using one-hot encoding. However, to represent the relative order of age categories, I will encode the age feature with consecutive integers and normalise them.
 
-\paragraph{Feature sets} I will analyse two feature sets: \textit{full} feature set with 198 total features (after preprocessing), and \textit{reduced} feature set with 93 features, which excludes the medication name data and medical specialty. 
+\paragraph{Feature sets} I will analyse two feature sets: \textit{full} feature set with 198 total features (after preprocessing), and \textit{reduced} feature set with 93 features, the latter excluding medication and medical specialty data. 
 
 \paragraph{Train and test split} I chose 90\%/10\% stratified train/test split with 7149 train and 795 test instances.
 
-\subsection{Simple multi-class classifiers}
-Prediction of three readmission outcome labels is an instance of a multi-class classification task. I implement the multi-class \textit{Naive Bayes}, \textit{stochastic gradient descent} and \textit{logistic regression} classifiers (using \textit{one-vs-all} strategy where appropriate).
+\paragraph{Hyperparameters} I generally tried to use the default hyperparameters. For the best performing classifiers I then used grid search and similar techniques to further improve the accuracy. All hyperparameters used for each classifier can be found in \texttt{training.py} script.
 
-The results are generally better for the reduced feature set, where 5-fold cross-validation gave the best results for \texttt{LogisticRegression} classifier (mean accuracy 53.4\%). All three classifiers performed better than the baseline mean accuracy (random guessing based on label distribution) of 33.3\% (Table \ref{multiclass}). Further grid search on regularisation parameters and regularisation strength increased the mean cross-validation accuracy of logistic regression classifier to 53.9\%.
+\subsection{Simple multi-class classifiers}
+Prediction of three readmission outcome labels is an instance of a multi-class classification task. I implement the multi-class \textit{Naive Bayes} (NB), \textit{stochastic gradient descent} (SGD) and \textit{logistic regression}  (LogReg) classifiers (using \textit{one-vs-all} strategy where appropriate).
+
+\paragraph{Results} The results are generally better for the reduced feature set, where 5-fold cross-validation gave the best results for the logistic regression classifier (mean accuracy 53.4\%). All three classifiers performed better than the baseline mean accuracy (random guessing based on label distribution) of 33.3\% (Table \ref{multiclass}). The reduced feature set generally worked better, although not by much – these results, especially for logistic regression, could be subject to randomness.
+
+\paragraph{Grid search} Further grid search on regularisation parameters and regularisation strength increased the mean cross-validation accuracy of logistic regression classifier to 53.9\% for both full and reduced feature sets.
 
 \begin{table}[]
 	\begin{tabularx}{\linewidth}{XXXXX}
 		\hline
 								 & \textbf{Baseline} & \textbf{NB} & \textbf{LogReg} & \textbf{SGD} \\ \hline
 		full   & 33.3\%            & 37.2\%      & 53.6\%          & 50.2\%       \\
-		reduced & 33.3\%            & 38.7\%      & 53.8\%          & 52.8\%       \\ \hline
+		red. & 33.3\%            & 38.7\%      & 53.8\%          & 52.8\%       \\ \hline
 		\end{tabularx}
-\caption{Mean cross-validation accuracies for selected multi-class classifiers and feature sets.}\label{multiclass}
+\caption{Mean training set cross-validation accuracies for baseline, Naive Bayes, logistic regression and stochastic gradient descent classifiers, trained on full and reduced feature sets.}\label{multiclass}
 \end{table}
 
 \paragraph{Kernel trick} Transforming the reduced feature set using the \texttt{RBFSampler} with default parameters resulted in accuracies between 34\% and 37\%, therefore worse predictive power.
 
 \subsection{Ensemble models}
+For ensemble models, I have implemented the following: 
+\begin{enumerate}[label=(\textit{\roman*})]
+	\item A \textit{voting classifier} based on logistic regression, random forest and C-support vector classifiers;
+	\item The \textit{bagging} and \textit{pasting} techniques on a \textit{decision tree} classifier (implemented as \textit{random forest});
+	\item The \textit{adaptive boosting} (AB) technique on a \textit{decision tree} classifier;
+	\item The \textit{gradient boosting} (GB) technique on a decision tree classifier.
+\end{enumerate}
+
+\begin{table}[]
+	\begin{tabularx}{\linewidth}{XXXXXX}
+		\hline
+			& \textbf{Voting} & \textbf{Bag.} &\textbf{Past.} & \textbf{AB} & \textbf{GB} \\ \hline
+	full   & 54.7\%  & 52.9\% & 53.3\% & 54.1\% & 52.9\% \\
+	red. & 54.3\% & 53.7\% & 53.6\% & 53.9\% & 52.3\% \\ 
+	\hline
+	\end{tabularx}
+	\caption{Mean training set cross-validation accuracies for voting, bagging, adaptive boosting and gradient boosting ensembles, trained on full and reduced feature sets. \textit{Out-of-bag scores are reported for the bagging classifier}.}\label{ensemble}
+\end{table}
+
+\paragraph{Results} The results are presented in Table \ref{ensemble}, with out-of-bag scores for the bagging classifier as these give a better performance estimate. Generally results are similar between ensemble techniques and feature sets since the differences in accuracies are small and vary depending on the technique chosen. The highest result in this comparison was for the voting classifier which gave the accuracy of 54.7\% for the full feature set.
 
 
-
+\paragraph{Tuning}
+Further hyperparameter search using automated machine learning tools gave the gradient boosting classifier with accuracy boosted to 54.8\% on the full feature set and \textbf{55.4\% on the reduced feature set}. Since this is the best cross-validation accuracy among all classifiers I will use this model for further evaluation.
 
 \section{Evaluation}
+
 
 \section{Dimensionality reduction and embeddings}
 
