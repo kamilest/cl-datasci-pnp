@@ -170,7 +170,7 @@ In the following section I implement the various machine learning algorithms cov
 
 \paragraph{Categorical features} For most categorical features I will be using one-hot encoding. However, to represent the relative order of age categories, I will encode the age feature with consecutive integers and normalise them.
 
-\paragraph{Feature sets} I will analyse two feature sets: \textit{full} feature set with 198 total features (after preprocessing), and \textit{reduced} feature set with 93 features, the latter excluding medication and medical specialty data. I based this design choice on the fact that most of the patients will not be taking all 24 drugs, so the features add little information most of the time while accounting for around half of the total features after preprocessing.
+\paragraph{Feature sets} I will analyse two feature sets: \textit{full} feature set with 198 total features (after preprocessing), and \textit{reduced} feature set with 93 features, the latter excluding medication and medical specialty data. I based this design choice on the assumption that most of the patients will not be taking all 24 drugs, so the features add little information most of the time while accounting for around half of the total features after preprocessing.
 
 \paragraph{Train and test split} I chose 90\%/10\% stratified train/test split with 7149 train and 795 test instances.
 
