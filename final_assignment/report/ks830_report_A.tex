@@ -179,7 +179,7 @@ In the following section I implement the various machine learning algorithms cov
 \subsection{Simple multi-class classifiers}
 Prediction of three readmission outcome labels is an instance of a multi-class classification task. I implement the multi-class \textit{Naive Bayes} (NB), \textit{stochastic gradient descent} (SGD) and \textit{logistic regression}  (LogReg) classifiers (using \textit{one-vs-all} strategy where appropriate).
 
-\paragraph{Results} The results are generally better for the reduced feature set, where 5-fold cross-validation gave the best results for the logistic regression classifier (mean accuracy 53.4\%). All three classifiers performed better than the baseline mean accuracy (random guessing based on label distribution) of 33.3\% (Table \ref{multiclass}). The reduced feature set generally worked better, although not by much – these results, especially for logistic regression, are likely to be subject to noise.
+\paragraph{Results} The 5-fold cross-validation on the training set gave the best results for the logistic regression classifier (mean accuracy 53.4\%). All three classifiers performed better than the baseline mean accuracy (random guessing based on label distribution) of 33.3\% (Table \ref{multiclass}). The reduced feature set generally worked better, although not by much – these results, especially for logistic regression, are likely to be subject to noise.
 
 \paragraph{Grid search} Further grid search on regularisation parameters and regularisation strength increased the mean cross-validation accuracy of logistic regression classifier to 53.9\% for both full and reduced feature sets.
 
@@ -215,7 +215,7 @@ For ensemble models, I have implemented the following:
 	\caption{Mean training set cross-validation accuracies for voting, bagging, adaptive boosting and gradient boosting ensembles, trained on full and reduced feature sets. \textit{Out-of-bag scores are reported for the bagging classifier}.}\label{ensemble}
 \end{table}
 
-\paragraph{Results} The results are presented in Table \ref{ensemble}, with out-of-bag scores for the bagging classifier as these give a better performance estimate. Generally results are similar between ensemble techniques and feature sets since the differences in accuracies are small and vary depending on the technique chosen. The highest result in this comparison was for the voting classifier which gave the mean cross-validation accuracy of 54.7\% for the full feature set.
+\paragraph{Results} The results are presented in Table \ref{ensemble}, with out-of-bag scores for the bagging classifier (since these give a better test dataset performance estimate). Generally results are similar between ensemble techniques and feature sets since the differences in accuracies are small and vary depending on the technique chosen. The highest result in this comparison was for the voting classifier which gave the mean cross-validation accuracy of 54.7\% for the full feature set.
 
 
 \paragraph{Tuning}
@@ -238,7 +238,7 @@ In this section I report the test set performance of the best classifier.
 	\caption{ROC curves for the best classifier.}\label{rocauc}
 \end{figure}
 
-\paragraph{Interpretation} The confusion matrix is shown in Figure \ref{confmatrix}. From this and the ROC curves it can be seen that the instances where the patient was not readmitted were distinguished the best, followed by the instances where the patient was readmitted the soonest (‘<30’). The classifier was the worst at distinguishing the ‘>30’ readmission outcome. This makes sense intuitively – if the time until readmission spans many years, the initial encounter record may not contain enough information to foresee this and therefore the patient is misclassified as healthy (not readmitted).
+\paragraph{Interpretation} The confusion matrix is shown in Figure \ref{confmatrix}. It can be seen that the instances where the patient was not readmitted were distinguished the best, followed by the instances where the patient was readmitted the soonest (‘<30’). The classifier was the worst at distinguishing the ‘>30’ readmission outcome (corresponding to the worst ROC curve and lowest AUC for that class). This makes sense intuitively – if the time until readmission spans many years, the initial encounter record may not contain enough information to foresee this and therefore the patient is misclassified as healthy (not readmitted).
 
 \begin{figure}[htb!]
 	\centering
