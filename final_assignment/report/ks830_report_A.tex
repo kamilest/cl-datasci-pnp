@@ -224,35 +224,27 @@ Further hyperparameter search using automated machine learning tools \cite{Olson
 \section{Further evaluation of the best performing classifier}
 In this section I report the test set performance of the best classifier.
 
-\paragraph{Test accuracy} The final test set accuracy of the best performing classifier was \textbf{55.5\%}.
+\paragraph{Test accuracy} The final test set accuracy of the best performing classifier was \textbf{55.5\%}. 
 
-\paragraph{Precision, recall and $F_1$ score} I report the scores for each class individually, combined using macro-averaging (which treats all classes equally) by averaging the metrics computed for each class.
 
-Scores for  each class (precision, recall, F1):
-macro 0.5712197606315254 0.5254195493900474 0.5133421261573391
-micro 0.5547169811320755 0.5547169811320755 0.5547169811320755
-weighted 0.5658632303693347 0.5547169811320755 0.5248062502096993
 
-AUC:
-each class [0.78352584 0.63609384 0.75772971]
-macro average 0.7257831284509509
-micro average 0.7395569795498596
-weighted average 0.7280227128387536
+\paragraph{Precision, recall and $F_1$ score} The overall precision and recall, combined using \textit{macro-averaging} (which treats all classes equally by averaging the metrics computed for each class), are 0.571 and 0.525 respectively. If we average $F_1$ scores in a similar manner (rather than combining the previous two scores directly), the overall multi-class $F_1$ score is 0.513.
 
-Figure \ref{rocauc} shows the receiver operating characteristic curves.
-
-\begin{figure}[htb!]
-	\centering
-	\includegraphics[width=0.6\linewidth]{figures/confmatrix.png}
-	\caption{Confusion matrix for the best classifier.}\label{confmatrix}
-\end{figure}
+\paragraph{Receiver operating characteristic} The ROC curves can be seen in Figure \ref{rocauc}. The individual AUC scores are 0.784, 0.636, and 0.758 for ‘<30’, `>30' and `NO' cases respectively. The macro-averaging strategy gives the combined AUC score of 0.726.
 
 \begin{figure}[htb!]
 	\centering
 	\includegraphics[width=\linewidth]{figures/rocauc.png}
-	\caption{ROC-AUC curve for the best classifier.}\label{rocauc}
+	\caption{ROC curves for the best classifier.}\label{rocauc}
 \end{figure}
 
+\paragraph{Interpretation} The confusion matrix is shown in Figure \ref{confmatrix}. From this and the ROC curves it can be seen that the instances where the patient was not readmitted were distinguished the best, followed by the instances where the patient was readmitted the soonest (‘<30’). The classifier was the worst at distinguishing the ‘>30’ readmission outcome. This makes sense intuitively – if the time until readmission spans many years, the initial encounter record may not contain enough information to foresee this and therefore the patient is misclassified as healthy and not readmitted.
+
+\begin{figure}[htb!]
+	\centering
+	\includegraphics[width=0.8\linewidth]{figures/confmatrix.png}
+	\caption{Confusion matrix for the best classifier.}\label{confmatrix}
+\end{figure}
 
 \section{Dimensionality reduction and embeddings}
 
