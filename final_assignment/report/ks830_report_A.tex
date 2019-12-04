@@ -156,6 +156,8 @@ The main focus of this dataset is the readmission outcomes for diabetic patients
 
 \section{Machine learning algorithms implementation}
 
+In the following section I implement the various machine learning algorithms covered in the course and report the accuracy scores. I will further evaluate the algorithm that had the best accuracy in the Evaluation section.
+
 \subsection{Preprocessing and design choices}
 
 \paragraph{Anonymisation} Some patients have multiple encounter records (up to 15 per patient). This might skew the results of further analysis (whether exploration or classification) as models might learn to identify particular patients (through patient number or otherwise). For this reason at most one randomly sampled encounter per patient will be included in further analysis, and patient and encounter numbers removed. This leaves 7944 unique instances.
@@ -168,7 +170,7 @@ The main focus of this dataset is the readmission outcomes for diabetic patients
 
 \paragraph{Categorical features} For most categorical features I will be using one-hot encoding. However, to represent the relative order of age categories, I will encode the age feature with consecutive integers and normalise them.
 
-\paragraph{Feature sets} I will analyse two feature sets: \textit{full} feature set with 198 total features (after preprocessing), and \textit{reduced} feature set with 93 features, the latter excluding medication and medical specialty data. 
+\paragraph{Feature sets} I will analyse two feature sets: \textit{full} feature set with 198 total features (after preprocessing), and \textit{reduced} feature set with 93 features, the latter excluding medication and medical specialty data. I based this design choice on the fact that most of the patients will not be taking all 24 drugs, so the features add little information most of the time while accounting for around half of the total features after preprocessing.
 
 \paragraph{Train and test split} I chose 90\%/10\% stratified train/test split with 7149 train and 795 test instances.
 
@@ -217,12 +219,17 @@ For ensemble models, I have implemented the following:
 
 
 \paragraph{Tuning}
-Further hyperparameter search using automated machine learning tools boosted the accuracy of the gradient boosting classifier to 54.8\% on the full feature set and \textbf{55.4\% on the reduced feature set}. Since this is the best cross-validation accuracy among all classifiers I will use this model for further evaluation.
+Further hyperparameter search using automated machine learning tools \cite{OlsonGECCO2016} boosted the training set cross-validation accuracy of the gradient boosting classifier to 54.8\% on the full feature set and \textbf{55.4\% on the reduced feature set}. Since this is the best cross-validation accuracy among all classifiers I will use this model for further evaluation.
 
-\section{Evaluation}
+\section{Further evaluation of the best performing classifier}
 
 
 \section{Dimensionality reduction and embeddings}
 
+
+\medskip
+ 
+\bibliographystyle{unsrt}
+\bibliography{ks830_report_A}
 
 \end{document}
