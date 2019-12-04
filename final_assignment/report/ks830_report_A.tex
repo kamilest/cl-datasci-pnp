@@ -174,7 +174,7 @@ In the following section I implement the various machine learning algorithms cov
 
 \paragraph{Train and test split} I chose 90\%/10\% stratified train/test split with 7149 train and 795 test instances.
 
-\paragraph{Hyperparameters} I generally tried to use the default hyperparameters. For the best performing classifiers I then used grid search and similar techniques to further improve the accuracy. All hyperparameters used for each classifier can be found in \texttt{training.py} script.
+\paragraph{Hyperparameters} I generally tried to use the default hyperparameters. For the best performing classifiers I then used grid search and similar techniques to further improve the accuracy. The hyperparameters used for each classifier can be found in \texttt{training.py} script.
 
 \subsection{Simple multi-class classifiers}
 Prediction of three readmission outcome labels is an instance of a multi-class classification task. I implement the multi-class \textit{Naive Bayes} (NB), \textit{stochastic gradient descent} (SGD) and \textit{logistic regression}  (LogReg) classifiers (using \textit{one-vs-all} strategy where appropriate).
@@ -238,7 +238,7 @@ In this section I report the test set performance of the best classifier.
 	\caption{ROC curves for the best classifier.}\label{rocauc}
 \end{figure}
 
-\paragraph{Interpretation} The confusion matrix is shown in Figure \ref{confmatrix}. From this and the ROC curves it can be seen that the instances where the patient was not readmitted were distinguished the best, followed by the instances where the patient was readmitted the soonest (‘<30’). The classifier was the worst at distinguishing the ‘>30’ readmission outcome. This makes sense intuitively – if the time until readmission spans many years, the initial encounter record may not contain enough information to foresee this and therefore the patient is misclassified as healthy and not readmitted.
+\paragraph{Interpretation} The confusion matrix is shown in Figure \ref{confmatrix}. From this and the ROC curves it can be seen that the instances where the patient was not readmitted were distinguished the best, followed by the instances where the patient was readmitted the soonest (‘<30’). The classifier was the worst at distinguishing the ‘>30’ readmission outcome. This makes sense intuitively – if the time until readmission spans many years, the initial encounter record may not contain enough information to foresee this and therefore the patient is misclassified as healthy (not readmitted).
 
 \begin{figure}[htb!]
 	\centering
