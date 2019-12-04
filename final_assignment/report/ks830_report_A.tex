@@ -222,7 +222,24 @@ For ensemble models, I have implemented the following:
 Further hyperparameter search using automated machine learning tools \cite{OlsonGECCO2016} boosted the training set cross-validation accuracy of the gradient boosting classifier to 54.8\% on the full feature set and \textbf{55.4\% on the reduced feature set}. Since this is the best cross-validation accuracy among all classifiers I will use this model for further evaluation.
 
 \section{Further evaluation of the best performing classifier}
-In this section I report the performance of the best classifier on test data.
+In this section I report the test set performance of the best classifier.
+
+\paragraph{Test accuracy} The final test set accuracy of the best performing classifier was \textbf{55.5\%}.
+
+\paragraph{Precision, recall and $F_1$ score} I report the scores for each class individually, combined using macro-averaging (which treats all classes equally) by averaging the metrics computed for each class.
+
+Scores for  each class (precision, recall, F1):
+macro 0.5712197606315254 0.5254195493900474 0.5133421261573391
+micro 0.5547169811320755 0.5547169811320755 0.5547169811320755
+weighted 0.5658632303693347 0.5547169811320755 0.5248062502096993
+
+AUC:
+each class [0.78352584 0.63609384 0.75772971]
+macro average 0.7257831284509509
+micro average 0.7395569795498596
+weighted average 0.7280227128387536
+
+Figure \ref{rocauc} shows the receiver operating characteristic curves.
 
 \begin{figure}[htb!]
 	\centering
@@ -233,7 +250,7 @@ In this section I report the performance of the best classifier on test data.
 \begin{figure}[htb!]
 	\centering
 	\includegraphics[width=\linewidth]{figures/rocauc.png}
-	\caption{ROC-AUC curve for the best performing classifier.}\label{rocauc}
+	\caption{ROC-AUC curve for the best classifier.}\label{rocauc}
 \end{figure}
 
 
