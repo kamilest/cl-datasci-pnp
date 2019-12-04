@@ -222,6 +222,19 @@ For ensemble models, I have implemented the following:
 Further hyperparameter search using automated machine learning tools \cite{OlsonGECCO2016} boosted the training set cross-validation accuracy of the gradient boosting classifier to 54.8\% on the full feature set and \textbf{55.4\% on the reduced feature set}. Since this is the best cross-validation accuracy among all classifiers I will use this model for further evaluation.
 
 \section{Further evaluation of the best performing classifier}
+In this section I report the performance of the best classifier on test data.
+
+\begin{figure}[htb!]
+	\centering
+	\includegraphics[width=0.6\linewidth]{figures/confmatrix.png}
+	\caption{Confusion matrix for the best classifier.}\label{confmatrix}
+\end{figure}
+
+\begin{figure}[htb!]
+	\centering
+	\includegraphics[width=\linewidth]{figures/rocauc.png}
+	\caption{ROC-AUC curve for the best performing classifier.}\label{rocauc}
+\end{figure}
 
 
 \section{Dimensionality reduction and embeddings}
