@@ -104,15 +104,15 @@ First I examine patient demographic data. The first part of Figure \ref{genderag
     \end{subfigure}
 	\caption{Patient age distributions categorised by outcome and gender.}\label{genderagecountreadmitted}
 \end{figure}
-Generally, more adult patients are readmitted than not, and we can observe that patients from the age of 60 have higher occurrence of `<30' label compared to `>30', indicating that they are more likely to be readmitted sooner.
+Generally, more adult patients are readmitted than not, and we can observe that patients from the age of 60 have higher occurrence of `<30' label compared to `>30', indicating that they are more likely to be readmitted sooner. Further categorising by gender (bottom part of Figure \ref{genderagecountreadmitted}), we can see that the readmission frequency increases earlier for female patients, where the relative occurrence of `<30' and `>30' changes at 60-70 rather than 70-80 years old.
 
-\begin{figure}[htb!]
-	\centering
-	\includegraphics[width=\linewidth]{figures/gender_age_count.png}
-	\caption{Patient age distribution by gender.}\label{genderagecount}
-\end{figure}
 
-Further categorising by gender (bottom part of Figure \ref{genderagecountreadmitted}), we can see that the readmission frequency increases earlier for female patients, where the relative occurrence of `<30' and `>30' changes at 60-70 rather than 70-80 years old. In general, we can see that for female patients both the absolute (compared to male) and relative (compared to younger female) admission numbers get higher with increased age, which can be also seen in Figure \ref{genderagecount}. This might suggest the longer lifespan of female patients.
+% \begin{figure}[htb!]
+% 	\centering
+% 	\includegraphics[width=\linewidth]{figures/gender_age_count.png}
+% 	\caption{Patient age distribution by gender.}\label{genderagecount}
+% \end{figure}
+% In general, we can see that for female patients both the absolute (compared to male) and relative (compared to younger female) admission numbers get higher with increased age, which can be also seen in Figure \ref{genderagecount}. This might suggest the longer lifespan of female patients.
 
 \begin{figure*}[t!]
 	\centering
@@ -127,10 +127,6 @@ Further categorising by gender (bottom part of Figure \ref{genderagecountreadmit
     \end{subfigure}
 	\caption{Distributions of admission and discharge identifiers; kernel density estimates for numerical features.}\label{kdeplots}
   \end{figure*}
-
-
-
-
 
 \subsection{Relationship between the type of treatment and readmission}
 
@@ -149,6 +145,13 @@ The higher number of diagnoses is associated with the likelihood of readmission 
 
 \subsection{Relationship between diabetes conditions and readmission}
 The main focus of this dataset is the readmission outcomes for diabetic patients, and their relationship to diabetes-specific treatment.
+
+
+\begin{figure}[htb!]
+	\centering
+	\includegraphics[width=\linewidth]{figures/diagtypecount.png}
+	\caption{Distribution of readmission outcomes by diagnosis.}\label{diag}
+\end{figure}
 
 \LARGE{TODO}
 
@@ -247,7 +250,26 @@ In this section I report the test set performance of the best classifier.
 \end{figure}
 
 \section{Dimensionality reduction and embeddings}
+The following dimensionality reduction techniques work on numerical features only. For further analysis I will consider features that have clear numerical meaning (i.e. I will exclude features which are encoded as numbers but are categories, and will encode ordinal features, such as age, as numbers).
 
+\subsection{Principal component analysis}
+
+The projection of the first two PCA components is displayed in Figure \ref{pca}. It can be seen that the patients who are readmitted are more spread out along the second component range while the not readmitted patients are displayed closer together at the bottom of the figure where the second component is around 0.
+
+\begin{figure}[htb!]
+	\centering
+	\includegraphics[width=\linewidth]{figures/pca.png}
+	\caption{Principal components analysis of the diabetic patient dataset.}\label{pca}
+\end{figure}
+
+\subsection{$t$-distributed stochastic neighbour embedding}
+The $t$-SNE embedding is shown in Figure \ref{tsne}. Those embeddings do not separate the readmission outcomes well, but at all perplexities four main clusters can be seen (one containing the majority of the values, a ``triangular'' cluster and two smaller well-separated clusters).
+
+\begin{figure*}[t!]
+	\centering
+	\includegraphics[width=\textwidth]{figures/tsne.png}
+	\caption{t-SNE embeddings of the diabetic patient dataset for selected perplexities.}\label{tsne}
+  \end{figure*}
 
 \medskip
  
