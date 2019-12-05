@@ -78,7 +78,9 @@
 \textbf{Data Science: Principles and Practice \\ Final Assignment A} \\[4mm]
 
 \large
-Kamilė Stankevičiūtė (\texttt{ks830}) \\ Gonville \& Caius College
+Kamilė Stankevičiūtė (\texttt{ks830}) \\ Gonville \& Caius College \\[4mm]
+
+2176 words\footnote{Counted using LaTeX Utilities extension in VSCode.}
 
 % \today % October 2019
 \end{center} \vskip10mm}]
@@ -156,7 +158,7 @@ This dataset focuses on the readmission outcomes of diabetic patients in particu
 
 Some set of interesting histograms is in Figure \ref{diag}, where the patients are split by readmission outcome, the importance of diagnosis (primary or secondary), and the diagnosis type (which is based on the ICD numbers as described in Strack et al. \cite{strack2014dataset}). 
 
-By definition of the dataset, \textit{all} patients are supposed to have diabetes as one of their diagnoses; however, the relative number of diabetic patients in those distributions is low -- only 46.2\% of patients have diabetes listed as one of their first three diagnoses. This leaves the majority of admitted patients as having at least 4 diagnoses (which corresponds to the right-skewed distribution in the num\_diagnoses panel of Figure \ref{kdeplots}) where the diabetes is not among the first three. From the histograms, we can see that circulatory problems are very common -- indeed, over 62\% of the admitted patients had a circulatory problem as one of their first three diagnoses, and 58\% of those had it listed as the primary diagnosis. Another common set of conditions is related to respiratory issues, where 12\% of all patients had it as their primary diagnosis. Given that most patients admitted had more serious primary health problems (and that many of those were probably an emergency), it might explain why only 18.2\% and 9.2\% of patients had their A1c and glucose serum tests taken respectively (with only 0.4\% having both), even though all of the admitted patients had a diabetes condition.
+By definition of the dataset, \textit{all} patients are supposed to have diabetes as one of their diagnoses; however, the relative number of diabetic patients in those distributions is low -- only 46.2\% of patients have diabetes listed as one of their first three diagnoses. This leaves the majority of admitted patients as having at least 4 diagnoses (which corresponds to the right-skewed distribution in the num\_diagnoses panel of Figure \ref{kdeplots}) where diabetes is not among the first three. From the histograms, we can see that circulatory problems are very common -- indeed, over 62\% of the admitted patients had a circulatory problem as one of their first three diagnoses, and 58\% of those had it listed as primary diagnosis. Another common set of conditions is related to respiratory issues, where 12\% of all patients had it as their primary diagnosis. Given that most patients admitted had more serious primary health problems (and that many of those were probably an emergency), it might explain why only 18.2\% and 9.2\% of patients had their A1c and glucose serum tests taken respectively (with only 0.4\% having both), even though all of the admitted patients had a diabetes condition.
 
 
 \section{Machine learning algorithms implementation}
@@ -264,7 +266,7 @@ The following dimensionality reduction techniques work on numerical features onl
 
 \subsection{Principal component analysis}
 
-The projection of the first two PCA components is displayed in Figure \ref{pca}. The patients who are readmitted are more spread out along the second component range while the not readmitted patients are displayed closer together at the bottom of the figure where the second component is around 0, which suggests the second component uses features that are helpful in distinguishing the `NO' outcome. Checking the components attribute of the \texttt{PCA} object in \texttt{sklearn} the second component uses the number of inpatient, outpatient and emergency visits the most. Indeed, Figure \ref{inoutemer} shows some distinct peaks for every class, which I surprisingly did not notice in the initial data exploration section!
+The projection of the first two PCA components is displayed in Figure \ref{pca}. The patients who are readmitted are more spread out along the second component range while the `NO' patients are displayed closer together at the bottom of the figure where the second component is around 0, which suggests the second component uses features that are helpful in distinguishing the `NO' outcome. Checking the \texttt{components\_} attribute of \texttt{sklearn}'s \texttt{PCA} object, the second component mostly uses the number of inpatient, outpatient and emergency visit data. Indeed, Figure \ref{inoutemer} shows some distinct peaks for every readmission outcome across the three plots, which I surprisingly overlooked in the initial data exploration section!
 
 \begin{figure}[htb!]
 	\centering
