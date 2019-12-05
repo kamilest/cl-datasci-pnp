@@ -85,7 +85,7 @@ Kamilė Stankevičiūtė (\texttt{ks830}) \\ Gonville \& Caius College
 
 \section{Data exploration}
 
-I examine the dataset of medical care records of diabetic patients over a period of 10 years (1999-2008), as presented in a given sample \textit{diabetic\_data\_balanced.csv}. This analysis has been done on the subset with at most one record per patient, as described in the next section.
+I examine the dataset of medical care records of diabetic patients over a period of 10 years (1999-2008) \cite{strack2014dataset}, as presented in a given sample \textit{diabetic\_data\_balanced.csv}. This analysis has been done on a subset with at most one record per patient, as described later in the Preprocessing section.
 
 \subsection{Patient demographics}
 
@@ -104,7 +104,8 @@ First I examine patient demographic data. The first part of Figure \ref{genderag
     \end{subfigure}
 	\caption{Patient age distributions categorised by outcome and gender.}\label{genderagecountreadmitted}
 \end{figure}
-Generally, more adult patients are readmitted than not, and we can observe that patients from the age of 60 have higher occurrence of `<30' label compared to `>30', indicating that they are more likely to be readmitted sooner. Further categorising by gender (bottom part of Figure \ref{genderagecountreadmitted}), we can see that the readmission frequency increases earlier for female patients, where the relative occurrence of `<30' and `>30' changes at 60-70 rather than 70-80 years old.
+
+Generally, more adult patients are readmitted than not, and we can observe that patients from the age of 60 have higher occurrence of `<30' label compared to `>30', indicating that they are more likely to be readmitted sooner. Further categorising by gender (bottom part of Figure \ref{genderagecountreadmitted}), the readmission frequency increases earlier for female patients, where the relative occurrence of `<30' and `>30' changes at 60-70 rather than 70-80 years old.
 
 
 % \begin{figure}[htb!]
@@ -130,9 +131,12 @@ Generally, more adult patients are readmitted than not, and we can observe that 
 
 \subsection{Relationship between the type of treatment and readmission}
 
-For this particular dataset, the kernel density estimate plots seemed to represent most of the important trends of the full scatter plot matrix while being much easier to read (Figure \ref{kdeplots}). The most interesting insights I observed were:
+For this particular dataset, distribution with kernel density estimate plots seemed to represent most of the key trends of the full scatter plot matrix while being much easier to read (Figure \ref{kdeplots}). The most interesting insights I observed were:
 
-The first peak in admission\_type\_id corresponds to emergency encounters which are very likely to result in readmission within 30 days, since the blue peak there is the highest.
+Most of the patients are admitted to the hospital in a case of an emergency (admission\_type\_id=1), followed by urgent admission (id=2) and elective (planned) admission. id=6 corresponds to missing admission type, which has more `NO' and `>30' patients
+
+Most of the patients are admitted through physician referral , followed by clinic referral and 
+The first peak in  corresponds to emergency encounters which are very likely to result in readmission within 30 days, since the blue peak there is the highest.
 
 A green peak at id=11 for discharge\_disposition\_id represents the patients who died at the hospital and therefore could never be readmitted. Some discharge disposition types (id=22, id=23) were associated only with patients readmitted within 30 days. Those ids correspond to transfers to another rehabilitation facility and transfers to long term care hospitals.
 
@@ -263,7 +267,7 @@ The projection of the first two PCA components is displayed in Figure \ref{pca}.
 \end{figure}
 
 \subsection{$t$-distributed stochastic neighbour embedding}
-The $t$-SNE embedding is shown in Figure \ref{tsne}. Those embeddings do not separate the readmission outcomes well, but at all perplexities four main clusters can be seen (one containing the majority of the values, a ``triangular'' cluster and two smaller well-separated clusters).
+The t-SNE embeddings are shown in Figure \ref{tsne}. Those embeddings do not separate the readmission outcomes well, but at all perplexities four main clusters can be seen (one containing the majority of the values, a ``triangular'' cluster and two smaller well-separated clusters).
 
 \begin{figure*}[t!]
 	\centering
