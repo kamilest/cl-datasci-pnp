@@ -104,15 +104,15 @@ First I examine patient demographic data. The first part of Figure \ref{genderag
     \end{subfigure}
 	\caption{Patient age distributions categorised by outcome and gender.}\label{genderagecountreadmitted}
 \end{figure}
-Generally, more adult patients are readmitted than not, and we can observe that patients from the age of 60 have higher occurrence of `<30' label compared to `>30', indicating that they are more likely to be readmitted sooner.
+Generally, more adult patients are readmitted than not, and we can observe that patients from the age of 60 have higher occurrence of `<30' label compared to `>30', indicating that they are more likely to be readmitted sooner. Further categorising by gender (bottom part of Figure \ref{genderagecountreadmitted}), we can see that the readmission frequency increases earlier for female patients, where the relative occurrence of `<30' and `>30' changes at 60-70 rather than 70-80 years old.
 
-\begin{figure}[htb!]
-	\centering
-	\includegraphics[width=\linewidth]{figures/gender_age_count.png}
-	\caption{Patient age distribution by gender.}\label{genderagecount}
-\end{figure}
 
-Further categorising by gender (bottom part of Figure \ref{genderagecountreadmitted}), we can see that the readmission frequency increases earlier for female patients, where the relative occurrence of `<30' and `>30' changes at 60-70 rather than 70-80 years old. In general, we can see that for female patients both the absolute (compared to male) and relative (compared to younger female) admission numbers get higher with increased age, which can be also seen in Figure \ref{genderagecount}. This might suggest the longer lifespan of female patients.
+% \begin{figure}[htb!]
+% 	\centering
+% 	\includegraphics[width=\linewidth]{figures/gender_age_count.png}
+% 	\caption{Patient age distribution by gender.}\label{genderagecount}
+% \end{figure}
+% In general, we can see that for female patients both the absolute (compared to male) and relative (compared to younger female) admission numbers get higher with increased age, which can be also seen in Figure \ref{genderagecount}. This might suggest the longer lifespan of female patients.
 
 \begin{figure*}[t!]
 	\centering
@@ -127,10 +127,6 @@ Further categorising by gender (bottom part of Figure \ref{genderagecountreadmit
     \end{subfigure}
 	\caption{Distributions of admission and discharge identifiers; kernel density estimates for numerical features.}\label{kdeplots}
   \end{figure*}
-
-
-
-
 
 \subsection{Relationship between the type of treatment and readmission}
 
@@ -149,6 +145,13 @@ The higher number of diagnoses is associated with the likelihood of readmission 
 
 \subsection{Relationship between diabetes conditions and readmission}
 The main focus of this dataset is the readmission outcomes for diabetic patients, and their relationship to diabetes-specific treatment.
+
+
+\begin{figure}[htb!]
+	\centering
+	\includegraphics[width=\linewidth]{figures/diagtypecount.png}
+	\caption{Distribution of readmission outcomes by diagnosis.}\label{diag}
+\end{figure}
 
 \LARGE{TODO}
 
@@ -170,16 +173,16 @@ In the following section I implement the various machine learning algorithms cov
 
 \paragraph{Categorical features} For most categorical features I will be using one-hot encoding. However, to represent the relative order of age categories, I will encode the age feature with consecutive integers and normalise them.
 
-\paragraph{Feature sets} I will analyse two feature sets: \textit{full} feature set with 198 total features (after preprocessing), and \textit{reduced} feature set with 93 features, the latter excluding medication and medical specialty data. I based this design choice on the fact that most of the patients will not be taking all 24 drugs, so the features add little information most of the time while accounting for around half of the total features after preprocessing.
+\paragraph{Feature sets} I will analyse two feature sets: \textit{full} feature set with 198 total features (after preprocessing), and \textit{reduced} feature set with 93 features, the latter excluding medication and medical specialty data. I based this design choice on the assumption that most of the patients will not be taking all 24 drugs, so the features add little information most of the time while accounting for around half of the total features after preprocessing.
 
 \paragraph{Train and test split} I chose 90\%/10\% stratified train/test split with 7149 train and 795 test instances.
 
-\paragraph{Hyperparameters} I generally tried to use the default hyperparameters. For the best performing classifiers I then used grid search and similar techniques to further improve the accuracy. All hyperparameters used for each classifier can be found in \texttt{training.py} script.
+\paragraph{Hyperparameters} I generally tried to use the default hyperparameters. For the best performing classifiers I then used grid search and similar techniques to further improve the accuracy. The hyperparameters used for each classifier can be found in \texttt{training.py} script.
 
 \subsection{Simple multi-class classifiers}
 Prediction of three readmission outcome labels is an instance of a multi-class classification task. I implement the multi-class \textit{Naive Bayes} (NB), \textit{stochastic gradient descent} (SGD) and \textit{logistic regression}  (LogReg) classifiers (using \textit{one-vs-all} strategy where appropriate).
 
-\paragraph{Results} The results are generally better for the reduced feature set, where 5-fold cross-validation gave the best results for the logistic regression classifier (mean accuracy 53.4\%). All three classifiers performed better than the baseline mean accuracy (random guessing based on label distribution) of 33.3\% (Table \ref{multiclass}). The reduced feature set generally worked better, although not by much – these results, especially for logistic regression, are likely to be subject to noise.
+\paragraph{Results} The 5-fold cross-validation on the training set gave the best results for the logistic regression classifier (mean accuracy 53.4\%). All three classifiers performed better than the baseline mean accuracy (random guessing based on label distribution) of 33.3\% (Table \ref{multiclass}). The reduced feature set generally worked better, although not by much – these results, especially for logistic regression, are likely to be subject to noise.
 
 \paragraph{Grid search} Further grid search on regularisation parameters and regularisation strength increased the mean cross-validation accuracy of logistic regression classifier to 53.9\% for both full and reduced feature sets.
 
@@ -215,7 +218,7 @@ For ensemble models, I have implemented the following:
 	\caption{Mean training set cross-validation accuracies for voting, bagging, adaptive boosting and gradient boosting ensembles, trained on full and reduced feature sets. \textit{Out-of-bag scores are reported for the bagging classifier}.}\label{ensemble}
 \end{table}
 
-\paragraph{Results} The results are presented in Table \ref{ensemble}, with out-of-bag scores for the bagging classifier as these give a better performance estimate. Generally results are similar between ensemble techniques and feature sets since the differences in accuracies are small and vary depending on the technique chosen. The highest result in this comparison was for the voting classifier which gave the mean cross-validation accuracy of 54.7\% for the full feature set.
+\paragraph{Results} The results are presented in Table \ref{ensemble}, with out-of-bag scores for the bagging classifier (since these give a better test dataset performance estimate). Generally results are similar between ensemble techniques and feature sets since the differences in accuracies are small and vary depending on the technique chosen. The highest result in this comparison was for the voting classifier which gave the mean cross-validation accuracy of 54.7\% for the full feature set.
 
 
 \paragraph{Tuning}
@@ -234,20 +237,39 @@ In this section I report the test set performance of the best classifier.
 
 \begin{figure}[htb!]
 	\centering
-	\includegraphics[width=\linewidth]{figures/rocauc.png}
+	\includegraphics[width=0.8\linewidth]{figures/rocauc.png}
 	\caption{ROC curves for the best classifier.}\label{rocauc}
 \end{figure}
 
-\paragraph{Interpretation} The confusion matrix is shown in Figure \ref{confmatrix}. From this and the ROC curves it can be seen that the instances where the patient was not readmitted were distinguished the best, followed by the instances where the patient was readmitted the soonest (‘<30’). The classifier was the worst at distinguishing the ‘>30’ readmission outcome. This makes sense intuitively – if the time until readmission spans many years, the initial encounter record may not contain enough information to foresee this and therefore the patient is misclassified as healthy and not readmitted.
+\paragraph{Interpretation} The confusion matrix is shown in Figure \ref{confmatrix}. It can be seen that the instances where the patient was not readmitted were distinguished the best, followed by the instances where the patient was readmitted the soonest (‘<30’). The classifier was the worst at distinguishing the ‘>30’ readmission outcome (corresponding to the worst ROC curve and lowest AUC for that class). This makes sense intuitively – if the time until readmission spans many years, the initial encounter record may not contain enough information to foresee this and therefore the patient is misclassified as healthy (not readmitted).
 
 \begin{figure}[htb!]
 	\centering
-	\includegraphics[width=0.8\linewidth]{figures/confmatrix.png}
+	\includegraphics[width=0.7\linewidth]{figures/confmatrix.png}
 	\caption{Confusion matrix for the best classifier.}\label{confmatrix}
 \end{figure}
 
 \section{Dimensionality reduction and embeddings}
+The following dimensionality reduction techniques work on numerical features only. For further analysis I will consider features that have clear numerical meaning (i.e. I will exclude features which are encoded as numbers but are categories, and will encode ordinal features, such as age, as numbers).
 
+\subsection{Principal component analysis}
+
+The projection of the first two PCA components is displayed in Figure \ref{pca}. It can be seen that the patients who are readmitted are more spread out along the second component range while the not readmitted patients are displayed closer together at the bottom of the figure where the second component is around 0.
+
+\begin{figure}[htb!]
+	\centering
+	\includegraphics[width=\linewidth]{figures/pca.png}
+	\caption{Principal components analysis of the diabetic patient dataset.}\label{pca}
+\end{figure}
+
+\subsection{$t$-distributed stochastic neighbour embedding}
+The $t$-SNE embedding is shown in Figure \ref{tsne}. Those embeddings do not separate the readmission outcomes well, but at all perplexities four main clusters can be seen (one containing the majority of the values, a ``triangular'' cluster and two smaller well-separated clusters).
+
+\begin{figure*}[t!]
+	\centering
+	\includegraphics[width=\textwidth]{figures/tsne.png}
+	\caption{t-SNE embeddings of the diabetic patient dataset for selected perplexities.}\label{tsne}
+  \end{figure*}
 
 \medskip
  
