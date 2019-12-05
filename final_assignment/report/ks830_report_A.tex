@@ -105,7 +105,7 @@ First I examine patient demographic data. The first part of Figure \ref{genderag
 	\caption{Patient age distributions categorised by outcome and gender.}\label{genderagecountreadmitted}
 \end{figure}
 
-Generally, more adult patients are readmitted than not, and we can observe that patients from the age of 60 have higher occurrence of `<30' label compared to `>30', indicating that they are more likely to be readmitted sooner. Further categorising by gender (bottom part of Figure \ref{genderagecountreadmitted}), the readmission frequency increases earlier for female patients, where the relative occurrence of `<30' and `>30' changes at 60-70 rather than 70-80 years old.
+Generally, more adult patients are readmitted than not, and we can observe that patients from the age of 60 have higher occurrence of `<30' label compared to `>30', indicating that at that age the patients are likely to be readmitted sooner. Further categorising by gender (bottom part of Figure \ref{genderagecountreadmitted}), the readmission frequency increases earlier for female patients, where the relative occurrence of `<30' and `>30' changes at 60-70 rather than 70-80 years old.
 
 
 % \begin{figure}[htb!]
@@ -131,16 +131,11 @@ Generally, more adult patients are readmitted than not, and we can observe that 
 
 \subsection{Relationship between the type of treatment and readmission}
 
-For this particular dataset, distribution with kernel density estimate plots seemed to represent most of the key trends of the full scatter plot matrix while being much easier to read (Figure \ref{kdeplots}). The most interesting insights I observed were:
+For this particular dataset, distribution and normalised kernel density estimate plots seemed to represent most of the key trends of the full scatter plot matrix while being much easier to read (Figure \ref{kdeplots}). Here are some of the insights I gained from the data.
 
-Most of the patients are admitted to the hospital in a case of an emergency (admission\_type\_id=1), followed by urgent admission (id=2) and elective (planned) admission. id=6 corresponds to missing admission type, which has more `NO' and `>30' patients
+Most of the admissions to hospitals are related to emergency situations and serious medical problems. This can be seen from the peaks at admission\_source\_id=7 and admission\_type\_id=1 (where both identifiers correspond to emergency admission). The next highest source of admission is physician referral (admission\_source\_id=1), which may relate to urgent (but not emergency) and elective (planned) admissions (admission\_type\_ids 2 and 3). The relative distributions of readmission outcomes are similar across admission types (where the `NO' case is the most common and the readmission outcomes are lower and close in count), although there are some deviations from this. Similarity between distributions indicates that some particular id is uninformative for the readmission outcome, while the deviations are more important. For example, a single green peak at discharge\_disposition\_id=11 shows the patients who expired at that medical encounter -- we can infer with 100\% certainty (given the current power of medicine to bring dead people back to life) that they are not going to be readmitted.
 
-Most of the patients are admitted through physician referral , followed by clinic referral and 
-The first peak in  corresponds to emergency encounters which are very likely to result in readmission within 30 days, since the blue peak there is the highest.
-
-A green peak at id=11 for discharge\_disposition\_id represents the patients who died at the hospital and therefore could never be readmitted. Some discharge disposition types (id=22, id=23) were associated only with patients readmitted within 30 days. Those ids correspond to transfers to another rehabilitation facility and transfers to long term care hospitals.
-
-Patients are likely to be readmitted (the high orange peak) if they come from an emergency department. The first peak for all three densities corresponds to physician referral. The third peak corresponds to missing values, which, given the difference in densities, might indicate bias (patients that did not have source information were more likely to be readmitted).
+There is a proportion of patients with null and missing values (admission\_source\_id=17, discharge\_disposition\_id=18, admission\_type\_id=6). Their relative values (especially only `<30' patients having no discharge information) are generally different from the other distributions, which might indicate bias in how the records are filled.
 
 The length of stay distribution is more skewed to the right for the patients who were readmitted sooner, i.e. the patients which stayed for longer were more likely to be readmitted.
 
