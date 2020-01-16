@@ -1,0 +1,97 @@
+\documentclass[10pt, twocolumn]{article}
+%% Language and font encodings
+\usepackage[british]{babel}
+
+\usepackage[T1]{fontenc}
+
+%% Sets page size and margins
+\usepackage[a4paper,top=3cm,bottom=3cm,left=2cm,right=2cm]{geometry}
+
+\setlength{\columnsep}{12pt}
+
+\usepackage{amsmath,amssymb}  % Better maths support & more symbols
+\usepackage{bm}  % Define \bm{} to use bold math fonts
+\usepackage{mathtools}
+
+\usepackage[shortlabels]{enumitem}
+\usepackage[normalem]{ulem}
+
+\usepackage[utf8]{inputenc} % Any characters can be typed directly from the keyboard, eg ÃÂ©ÃÂ§ÃÂ±
+\DeclareUnicodeCharacter{2212}{-}
+
+\usepackage{parskip}
+\usepackage{graphicx}
+\graphicspath{{figures/}}
+
+\usepackage{subcaption}
+
+\usepackage{tabularx}
+
+\usepackage{hyperref}
+\urlstyle{same}
+
+% \renewcommand{\cfttoctitlefont}{\fontsize{12}{15}\selectfont\bfseries}
+% \renewcommand\cftsecfont{\small}
+% \renewcommand\cftsecafterpnum{\vskip 0pt}
+% \renewcommand\cftsecpagefont{\small}
+
+\usepackage{pdfsync}  % enable tex source and pdf output synchronicity
+
+
+\usepackage{fancyhdr}
+\fancypagestyle{first}{
+	\fancyhf{} % clear all header and footers
+	\renewcommand{\headrulewidth}{0pt} % remove the line
+	\setlength{\footskip}{50pt}
+	\fancyfoot[C]{\thepage}
+
+}
+
+\fancypagestyle{plain}{
+	\fancyhf{} % clear all header and footers
+	% \renewcommand{\headrulewidth}{0pt} % remove the line
+	% \setlength{\headheight}{5pt}
+	\setlength{\footskip}{50pt}
+	\fancyfoot[C]{\thepage}
+	\fancyhead[C]{\textbf{\svsubject—\svshortsubject{}\ (ks830)}}
+}
+
+\def\svauthor{Kamilė Stankevičiūtė (\texttt{ks830})}
+\def\college{Gonville \& Caius College}
+\def\svsubject{Data Science: Principles and Practice}
+\def\svshortsubject{Final Assignment B}
+
+\usepackage{pdfpages}
+\usepackage{float}
+\usepackage{stfloats}
+
+% \usepackage{minted}
+% \usemintedstyle{colorful}
+
+\begin{document}
+
+\thispagestyle{first}
+\pagestyle{plain}
+\twocolumn[{
+\begin{center}
+\LARGE
+\textbf{Data Science: Principles and Practice \\ Final Assignment B} \\[4mm]
+
+\large
+Kamilė Stankevičiūtė (\texttt{ks830}) \\ Gonville \& Caius College \\[4mm]
+
+% \today % October 2019
+\end{center} \vskip10mm}]
+
+
+\section{Data exploration}
+
+I examine the dataset of medical care records of diabetic patients over a period of 10 years (1999-2008) \cite{strack2014dataset}, as presented in a given sample \textit{diabetic\_data\_balanced.csv}. This analysis has been done on a subset with at most one record per patient, as described later in the Preprocessing section.
+
+
+\medskip
+ 
+\bibliographystyle{unsrt}
+\bibliography{ks830_report_b}
+
+\end{document}
