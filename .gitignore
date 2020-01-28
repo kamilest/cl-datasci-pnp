@@ -348,7 +348,10 @@ TSWLatexianTemp*
 final_assignment/ks830_code_A.zip
 final_assignment/ks830_code_A/
 
-final_assignment/training/diabetes/diabetic_data_balanced.csv
-final_assignment/training/diabetes/diabetic_data_original.csv
-final_assignment/training/diabetes/IDs_mapping.csv
+final_assignment_a/training/diabetes/diabetic_data_balanced.csv
+final_assignment_a/training/diabetes/diabetic_data_original.csv
+final_assignment_a/training/diabetes/IDs_mapping.csv
 
+final_assignment_b/training/diabetes/diabetic_data_balanced.csv
+final_assignment_b/training/diabetes/diabetic_data_original.csv
+final_assignment_b/training/diabetes/IDs_mapping.csv
