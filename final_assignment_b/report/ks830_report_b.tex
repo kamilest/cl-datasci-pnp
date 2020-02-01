@@ -86,23 +86,18 @@ Kamilė Stankevičiūtė (\texttt{ks830}) \\ Gonville \& Caius College \\[4mm]
 
 \section{Data preparation}
 
-I use the raw data (\textit{diabetic\_data\_original.csv}) of the same medical care record dataset \cite{strack2014dataset} as in Assignment A. The following section describes the changes in preprocessing steps with respect to the previous part of the assignment.
+I use the raw data (\textit{diabetic\_data\_original.csv}) of the same medical care record dataset \cite{strack2014dataset} as in Assignment A. The following section describes the changes in preprocessing steps with respect to the previous Assignment.
 
 \paragraph{Filtering}
-Due to the nature of the prediction task, only the patients with at least two recorded encounters will be considered. After filtering, the dataset contains 47021 encounters from 16773 unique patients. This is a much larger number of examples with any single patient contributing to a relatively small proportion of the dataset (compared to the balanced dataset in Assignment A). This makes overfitting less likely, which is why in this case I will allow multiple examples per patient. 
+Due to the nature of the prediction task, only the patients with at least two recorded encounters will be considered. After filtering, the dataset contains 47021 encounters from 16773 unique patients. This is a much larger number of examples with any single patient contributing to a relatively small proportion of the dataset (compared to the dataset in Assignment A). This makes overfitting less likely, which is why in this case I allow multiple examples per patient. 
 
 \paragraph{Anonymisation} As before, the encounter and patient numbers will be removed for training, but will be used to generate the \texttt{length\_of\_next\_stay} feature.
 
-\paragraph{Missing values} In the larger dataset, the features with most values missing are \textit{weight} (98.6\% missing), \textit{medical specialty} (51.0\%).
+\paragraph{Missing values} In the larger dataset, the features with most values missing are \textit{weight} (98.6\% missing) and \textit{medical specialty} (51.0\%), which I will not use for training.
 
-\paragraph{Unknown values, numerical and categorical features} No changes in processing compared to Assignment A.
+\paragraph{Unknown values, numerical and categorical features} No changes in processing compared to Assignment A: the features are converted to numeric or categorical values based on their true meaning. Diagnoses are first grouped into categories to avoid a large number of features with small number of examples. The numerical and categorical features are normalised and one-hot encoded respectively.
 
-\paragraph{Feature sets} Since the dataset is larger and the models are generally more powerful, I will train on the full feature set only, leaving feature extraction to the model.
-
-\paragraph{Train and test split} 
-TODO definitely split patients so that no patients in training leak to test.
-
-TODO proportion of train/test split and the numbers in every set. Consider using a validation set vs cross-validating on the train set 
+\paragraph{Feature sets} Since the dataset is larger and the neural network models more powerful, I will train on the full feature set, leaving feature extraction to the model.
 
 \section{Machine learning set-up}
 
@@ -114,16 +109,17 @@ This section describes measures taken to avoid data leakage between train and ho
 TODO \paragraph{(some more specific criterion)} t-SNE has shown...
 
 
+\subsection{Loss function}
+
+\section{Neural network architecture}
+
+TODO description of neural network architecture
+
+
 \subsection{Hyperparameters}
 I generally tried to use the default hyperparameters. 
 
 The hyperparameters used for each classifier can be found in \texttt{training.py} script.
-
-\subsection{Loss function}
-
-\section{Neural network architectures}
-
-TODO description of neural network architectures to be used in training
 
 \section{Results}
 TODO table and comparison of results, insights on which model is the best
