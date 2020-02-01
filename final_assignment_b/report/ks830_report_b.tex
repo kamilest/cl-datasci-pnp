@@ -84,9 +84,41 @@ Kamilė Stankevičiūtė (\texttt{ks830}) \\ Gonville \& Caius College \\[4mm]
 \end{center} \vskip10mm}]
 
 
-\section{Data exploration}
+\section{Data preparation}
 
-I examine the dataset of medical care records of diabetic patients over a period of 10 years (1999-2008) \cite{strack2014dataset}, as presented in a given sample \textit{diabetic\_data\_balanced.csv}. This analysis has been done on a subset with at most one record per patient, as described later in the Preprocessing section.
+I use the raw data (\textit{diabetic\_data\_original.csv}) of the same medical care record dataset \cite{strack2014dataset} as in Assignment A. The following section describes the changes in preprocessing steps with respect to the previous part of the assignment.
+
+\paragraph{Filtering}
+TODO filter out the patients that have less than two encounters per patient.
+
+TODO consider taking only one 
+
+\paragraph{Anonymisation} 
+TODO still remove patient/encounter number from the dataset 
+TODO I decided to keep multiple copies for the same patient but (make sure that at least the same patient does not get into both training and test set??)
+
+Some patients have multiple encounter records (up to 15 per patient). This might skew the results of further analysis (whether exploration or classification) as models might learn to identify particular patients (through patient number or otherwise). For this reason at most one randomly sampled encounter per patient will be included in further analysis, and patient and encounter numbers removed. 
+
+TODO This leaves ? unique instances.
+
+\paragraph{Missing values} 
+
+TODO which features in the dataset contain missing values and how much 
+
+TODO The dataset has several features with missing values, most notably weight (?\%), payer code (?\%), and medical specialty (?\%). The first two will be excluded from further analysis. I will assume that the values are missing at random and replace them (as well as the other missing categorical feature values) with a separate category. There seems to be no numerical feature values missing.
+
+\paragraph{Unknown values, numerical and categorical features} No changes in processing compared to assignment A.
+
+\paragraph{Feature sets} Since the dataset is larger and the models are generally more powerful, I will train on the full feature set only, leaving feature extraction to the model.
+
+\paragraph{Train and test split} 
+TODO stratification: based on patient, hospital (novel contexts), \dots
+
+TODO proportion of train/test split and the numbers in every set. Consider using a validation set.
+
+\paragraph{Hyperparameters} I generally tried to use the default hyperparameters. 
+
+The hyperparameters used for each classifier can be found in \texttt{training.py} script.
 
 
 \medskip
