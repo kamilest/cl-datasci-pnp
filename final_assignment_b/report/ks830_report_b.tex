@@ -89,15 +89,11 @@ Kamilė Stankevičiūtė (\texttt{ks830}) \\ Gonville \& Caius College \\[4mm]
 I use the raw data (\textit{diabetic\_data\_original.csv}) of the same medical care record dataset \cite{strack2014dataset} as in Assignment A. The following section describes the changes in preprocessing steps with respect to the previous part of the assignment.
 
 \paragraph{Filtering}
-Due to the nature of the prediction task, only the patients with at least two recorded encounters will be considered. The filtered dataset contains 47021 encounters from 16773 unique patients (with at least two encounters each). This is a much larger number of examples with any individual patient contributing to a relatively small proportion of the dataset (compared to the balanced dataset in Assignment A). This makes overfitting is less likely, which is why in this case I will allow multiple examples per patient. 
+Due to the nature of the prediction task, only the patients with at least two recorded encounters will be considered. After filtering, the dataset contains 47021 encounters from 16773 unique patients. This is a much larger number of examples with any single patient contributing to a relatively small proportion of the dataset (compared to the balanced dataset in Assignment A). This makes overfitting less likely, which is why in this case I will allow multiple examples per patient. 
 
-\paragraph{Anonymisation} As before, the encounter and patient numbers will be removed for training, but used to generate the \texttt{length\_of\_next\_stay} feature.
+\paragraph{Anonymisation} As before, the encounter and patient numbers will be removed for training, but will be used to generate the \texttt{length\_of\_next\_stay} feature.
 
-\paragraph{Missing values} 
-
-TODO which features in the dataset contain missing values and how much 
-
-TODO The dataset has several features with missing values, most notably weight (?\%), payer code (?\%), and medical specialty (?\%). The first two will be excluded from further analysis. I will assume that the values are missing at random and replace them (as well as the other missing categorical feature values) with a separate category. There seems to be no numerical feature values missing.
+\paragraph{Missing values} In the larger dataset, the features with most values missing are \textit{weight} (98.6\% missing), \textit{medical specialty} (51.0\%).
 
 \paragraph{Unknown values, numerical and categorical features} No changes in processing compared to Assignment A.
 
@@ -108,9 +104,36 @@ TODO definitely split patients so that no patients in training leak to test.
 
 TODO proportion of train/test split and the numbers in every set. Consider using a validation set vs cross-validating on the train set 
 
-\paragraph{Hyperparameters} I generally tried to use the default hyperparameters. 
+\section{Machine learning set-up}
+
+\subsection{Training and holdout set split}
+This section describes measures taken to avoid data leakage between train and holdout sets and train a generalisable model.
+
+\paragraph{Patient separation} In this assignment multiple encounters corresponding to the same patient will be used. To make sure the model does not identify and overfit to particular patients, the examples corresponding to the same patient should be either in training or holdout set but not both.
+
+TODO \paragraph{(some more specific criterion)} t-SNE has shown...
+
+
+\subsection{Hyperparameters}
+I generally tried to use the default hyperparameters. 
 
 The hyperparameters used for each classifier can be found in \texttt{training.py} script.
+
+\subsection{Loss function}
+
+\section{Neural network architectures}
+
+TODO description of neural network architectures to be used in training
+
+\section{Results}
+TODO table and comparison of results, insights on which model is the best
+\subsection{Predictive power}
+TODO 5-fold cross-validation... 
+
+\subsection{Impact of PCA on training performance}
+
+\section{Evaluation}
+TODO Evaluate the predictive power of the best model on the holdout set.
 
 
 \medskip
