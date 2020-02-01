@@ -89,17 +89,9 @@ Kamilė Stankevičiūtė (\texttt{ks830}) \\ Gonville \& Caius College \\[4mm]
 I use the raw data (\textit{diabetic\_data\_original.csv}) of the same medical care record dataset \cite{strack2014dataset} as in Assignment A. The following section describes the changes in preprocessing steps with respect to the previous part of the assignment.
 
 \paragraph{Filtering}
-TODO filter out the patients that have less than two encounters per patient.
+Due to the nature of the prediction task, only the patients with at least two recorded encounters will be considered. The filtered dataset contains 47021 encounters from 16773 unique patients (with at least two encounters each). This is a much larger number of examples with any individual patient contributing to a relatively small proportion of the dataset (compared to the balanced dataset in Assignment A). This makes overfitting is less likely, which is why in this case I will allow multiple examples per patient. 
 
-TODO consider taking only one 
-
-\paragraph{Anonymisation} 
-TODO still remove patient/encounter number from the dataset 
-TODO I decided to keep multiple copies for the same patient but (make sure that at least the same patient does not get into both training and test set??)
-
-Some patients have multiple encounter records (up to 15 per patient). This might skew the results of further analysis (whether exploration or classification) as models might learn to identify particular patients (through patient number or otherwise). For this reason at most one randomly sampled encounter per patient will be included in further analysis, and patient and encounter numbers removed. 
-
-TODO This leaves ? unique instances.
+\paragraph{Anonymisation} As before, the encounter and patient numbers will be removed for training, but used to generate the \texttt{length\_of\_next\_stay} feature.
 
 \paragraph{Missing values} 
 
@@ -107,14 +99,14 @@ TODO which features in the dataset contain missing values and how much
 
 TODO The dataset has several features with missing values, most notably weight (?\%), payer code (?\%), and medical specialty (?\%). The first two will be excluded from further analysis. I will assume that the values are missing at random and replace them (as well as the other missing categorical feature values) with a separate category. There seems to be no numerical feature values missing.
 
-\paragraph{Unknown values, numerical and categorical features} No changes in processing compared to assignment A.
+\paragraph{Unknown values, numerical and categorical features} No changes in processing compared to Assignment A.
 
 \paragraph{Feature sets} Since the dataset is larger and the models are generally more powerful, I will train on the full feature set only, leaving feature extraction to the model.
 
 \paragraph{Train and test split} 
-TODO stratification: based on patient, hospital (novel contexts), \dots
+TODO definitely split patients so that no patients in training leak to test.
 
-TODO proportion of train/test split and the numbers in every set. Consider using a validation set.
+TODO proportion of train/test split and the numbers in every set. Consider using a validation set vs cross-validating on the train set 
 
 \paragraph{Hyperparameters} I generally tried to use the default hyperparameters. 
 
