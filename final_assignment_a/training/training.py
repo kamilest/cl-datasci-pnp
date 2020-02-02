@@ -25,7 +25,6 @@ from sklearn.svm import SVC
 
 from sklearn.ensemble import BaggingClassifier, AdaBoostClassifier, GradientBoostingClassifier
 from sklearn.tree import DecisionTreeClassifier
-
 class DataFrameSelector(BaseEstimator, TransformerMixin):
     def __init__(self, attribute_names):
         self.attribute_names = attribute_names
