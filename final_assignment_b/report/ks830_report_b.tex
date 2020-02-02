@@ -88,12 +88,16 @@ Kamilė Stankevičiūtė (\texttt{ks830}) \\ Gonville \& Caius College \\[4mm]
 
 I use the raw data (\textit{diabetic\_data\_original.csv}) of the same medical care record dataset \cite{strack2014dataset} as in Assignment A. The following section describes the changes in preprocessing steps with respect to the previous Assignment.
 
+\subsection{Selection of training instances}
 \paragraph{Filtering}
-Due to the nature of the prediction task, only the patients with at least two recorded encounters will be considered. For each patient, I will not use the last encounter as a datapoint because the ground truth (the length of next stay) for it is unknown: either the patient was not readmitted (we did not observe the counterfactual result of how long the stay would have been had the patient been readmitted), or the patient was readmitted but the ground truth for this has not been recorded. For the filtered dataset of 47021 encounters for 16773 unique patients, this results in $47021-16773=30248$ instances.
+Due to the nature of the prediction task, only the patients with at least two recorded encounters will be considered. For each patient, I will not use the last encounter as a datapoint because the ground truth (the length of next stay) for it is unknown: either the patient was not readmitted (we did not observe the counterfactual result of how long the stay would have been had the patient been readmitted), or the patient was readmitted but the ground truth for this has not been recorded. 
 
-Unlike in the previous assignment, I will allow multiple examples per patient. I base this on the assumption that, because the dataset is larger and each patient contributes to a relatively small proportion of the dataset, overfitting is less likely.
+\paragraph{Multiple examples} Unlike in the previous assignment, I will allow multiple examples per patient. I base this on the assumption that, because the dataset is larger and each patient contributes to a relatively small proportion of the dataset, overfitting is less likely.
+
+\paragraph{Multiple readmission} Some patients have recorded follow-on visits even in cases when the readmission outcome is `NO' (e.g. at least 44 patients have been \textit{not readmitted more than once}). Further investigation would be necessary to determine what is the reason for this in order to correctly handle it—I decided to exclude any no-readmission encounters still left after filtering. This resulted in 29758 training instances for 16515 unique patients.
 
 
+\subsection{Feature preprocessing}
 \paragraph{Anonymisation} As before, the encounter and patient numbers will be removed for training, but will be used to generate the \texttt{length\_of\_next\_stay} feature.
 
 \paragraph{Missing values} In the filtered dataset, the features with most values missing are \textit{weight} (98.6\% missing) and \textit{medical specialty} (51.0\%), which I will not use for training. For other features, the missing values were imputed using median or constant strategy for numerical and categorical features respectively.
