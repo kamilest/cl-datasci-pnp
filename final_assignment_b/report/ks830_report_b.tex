@@ -96,9 +96,7 @@ Unlike in the previous assignment, I will allow multiple examples per patient. I
 
 \paragraph{Anonymisation} As before, the encounter and patient numbers will be removed for training, but will be used to generate the \texttt{length\_of\_next\_stay} feature.
 
-\paragraph{Missing values} In the larger dataset, the features with most values missing are \textit{weight} (98.6\% missing) and \textit{medical specialty} (51.0\%), which I will not use for training.
-
-TODO others will be imputed with \textit{constant values?}
+\paragraph{Missing values} In the larger dataset, the features with most values missing are \textit{weight} (98.6\% missing) and \textit{medical specialty} (51.0\%), which I will not use for training. For other features, the missing values were imputed using median or constant strategy for numerical and categorical features respectively.
 
 \paragraph{Numerical and categorical features} No changes in processing compared to Assignment A: the features are converted to numerical or categorical values based on their true meaning. Diagnoses are first grouped into categories to avoid a large number of features with small number of examples. The numerical and categorical features are normalised and one-hot encoded respectively.
 
@@ -116,19 +114,20 @@ TODO \paragraph{(some more specific criterion)} t-SNE has shown...
 
 \subsection{Probabilistic model}
 
-I model the predicted variable (length of next stay) using \textit{zero-truncated Poisson distribution} (ZTP). I truncate the zero because, if the follow-on visit happens, the length of stay must be at least 1, violating the assumptions of the regular Poisson distribution. The observations $y_i \in \mathbb{N}^+$ are therefore modelled using \[Y_i \sim \mathrm{ZTP}(f_\theta(x_i))\]
+I model the predicted variable (length of next stay) using \textit{zero-truncated Poisson distribution} (ZTP). I truncate the zero because, if the follow-on visit happens, the length of stay must be at least 1, violating the assumptions of the regular Poisson distribution where observations of 0 are possible. The observations $y_i \in \mathbb{N}^+$ are therefore modelled using \[Y_i \sim \mathrm{ZTP}(f_\theta(x_i))\]
 
 where 
 
-\begin{equation*}
+\begin{equation}
 	\mathbb{P}[Y_i = y_i] = \frac{f_\theta(x_i)^{y_i}}{(e^{f_\theta(x_i)} - 1)y_i!}.
-\end{equation*}
+	\label{eq1}
+\end{equation}
 
-\paragraph{Loss function} For $M$ examples, parameters $\theta$ maximising the probability of the dataset minimise the following loss function:
+\paragraph{Loss function} For $M$ examples, parameters $\theta$ maximising the probability of the dataset (expressed as the product of probabilities in (\ref{eq1}) for each observation) minimise the following loss function:
 
-\begin{equation*}
+\begin{equation}
 	\mathcal{L} = \sum\limits_{i=1}^{M} -y_i \log(f_\theta(x_i)) + \log(e^{f_\theta(x_i)} - 1) + \log(y_i!)
-\end{equation*}
+\end{equation}
 
 
 
@@ -140,7 +139,7 @@ TODO description of neural network architecture
 \subsection{Hyperparameters}
 I generally tried to use the default hyperparameters. 
 
-The hyperparameters used for each classifier can be found in \texttt{training.py} script.
+The hyperparameters used for each classifier can be found in \texttt{training.ipynb} script.
 
 \section{Results}
 TODO table and comparison of results, insights on which model is the best
