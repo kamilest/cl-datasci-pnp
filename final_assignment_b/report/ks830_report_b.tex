@@ -80,7 +80,7 @@
 \large
 Kamilė Stankevičiūtė (\texttt{ks830}) \\ Gonville \& Caius College \\[4mm]
 
-573 words
+? words
 \end{center} \vskip10mm}]
 
 
@@ -94,17 +94,17 @@ Due to the nature of the prediction task, only the patients with at least two re
 
 \paragraph{Multiple examples} Unlike in the previous assignment, I will allow multiple examples per patient. I base this on the assumption that, because the dataset is larger and each patient contributes to a relatively small proportion of the dataset, overfitting is less likely.
 
-\paragraph{Multiple readmission} Some patients have recorded follow-on visits even in cases when the readmission outcome is `NO' (e.g. at least 44 patients have been \textit{not readmitted more than once}). Further investigation would be necessary to determine what is the reason for this in order to correctly handle it—I decided to exclude any no-readmission encounters still left after filtering. This resulted in 29758 training instances for 16515 unique patients.
+\paragraph{Multiple readmission} Some patients have recorded follow-on visits even in cases when the readmission outcome is `NO' (e.g. at least 44 patients have been \textit{not readmitted more than once}). Further investigation would be necessary to determine the reason for this in order to handle it correctly—I decided to exclude any no-readmission encounters still left after filtering and length-of-next-stay feature generation. This resulted in 29758 training instances for 16515 unique patients.
 
 
 \subsection{Feature preprocessing}
-\paragraph{Anonymisation} As before, the encounter and patient numbers will be removed for training, but will be used to generate the \texttt{length\_of\_next\_stay} feature.
+\paragraph{Anonymisation} As before, the encounter and patient numbers will be removed for training.
 
 \paragraph{Missing values} In the filtered dataset, the features with most values missing are \textit{weight} (98.6\% missing) and \textit{medical specialty} (51.0\%), which I will not use for training. For other features, the missing values were imputed using median or constant strategy for numerical and categorical features respectively.
 
-\paragraph{Numerical and categorical features} Similar to processing in Assignment A: the features are converted to numerical or categorical values based on their true meaning. Diagnoses are first grouped into categories to avoid a large number of features with small number of examples. The numerical and categorical features are normalised and one-hot encoded respectively.
+\paragraph{Numerical and categorical features} Similar to processing in Assignment A: the features are converted to numerical or categorical values based on their meaning. Diagnoses are first grouped into categories to avoid a large number of features with small number of examples. The numerical and categorical features are normalised and one-hot encoded respectively.
 
-\paragraph{Feature sets} Since the dataset is larger and the neural network models more powerful, I will train on the full feature set, leaving feature extraction to the model.
+\paragraph{Feature sets} Since the dataset is larger and the neural network models more powerful, I will train on the full feature set.
 
 \section{Machine learning set-up}
 
@@ -133,6 +133,7 @@ where
 	\mathcal{L} = \sum\limits_{i=1}^{M} -y_i \log(f_\theta(x_i)) + \log(e^{f_\theta(x_i)} - 1) + \log(y_i!)
 \end{equation}
 
+Following the TensorFlow documentation on Poisson loss function,\footnote{\url{https://www.tensorflow.org/api_docs/python/tf/nn/log_poisson_loss}} to improve efficiency I will be computing the inexact version of this, emitting the constant $\log(y_i!)$ term.
 
 
 \section{Neural network architecture}
