@@ -89,36 +89,33 @@ Kamilė Stankevičiūtė (\texttt{ks830}) \\ Gonville \& Caius College \\[4mm]
 I use the raw data (\textit{diabetic\_data\_original.csv}) of the same medical care record dataset \cite{strack2014dataset} as in Assignment A. The following section describes the changes in preprocessing steps with respect to the previous Assignment.
 
 \subsection{Selection of training instances}
+The preprocessing steps below resulted in 16515 training instances.
+
 \paragraph{Filtering}
-Due to the nature of the prediction task, only the patients with at least two recorded encounters will be considered. For each patient, I will not use the last encounter as a datapoint because the ground truth (the length of next stay) for it is unknown: either the patient was not readmitted (we did not observe the counterfactual result of how long the stay would have been had the patient been readmitted), or the patient was readmitted but the ground truth for this has not been recorded. 
+Due to the nature of the prediction task, only the patients with at least two recorded encounters were considered. For each patient, I did not use the last encounter as a datapoint because the ground truth (the length of next stay) for it is unknown: either the patient was not readmitted (we did not observe the counterfactual result of how long the stay would have been had the patient been readmitted), or the patient was readmitted but the ground truth for this has not been recorded. 
 
-\paragraph{Multiple examples} Unlike in the previous assignment, I will allow multiple examples per patient. I base this on the assumption that, because the dataset is larger and each patient contributes to a relatively small proportion of the dataset, overfitting is less likely.
+\paragraph{Multiple examples} To ensure independence of all the examples in the dataset, I only used a single randomly sampled example per patient. 
 
-\paragraph{Multiple readmission} Some patients have recorded follow-on visits even in cases when the readmission outcome is `NO' (e.g. at least 44 patients have been \textit{not readmitted more than once}). Further investigation would be necessary to determine the reason for this in order to handle it correctly—I decided to exclude any no-readmission encounters still left after filtering and length-of-next-stay feature generation. This resulted in 29758 training instances for 16515 unique patients.
-
+\paragraph{Multiple readmission} Some patients have recorded follow-on visits even in cases when the readmission outcome is `NO' (e.g. at least 44 patients have been \textit{not readmitted more than once}). Further investigation would be necessary to determine the reason for this in order to handle it correctly—I decided to exclude any no-readmission encounters still left after filtering and length-of-next-stay feature generation. 
 
 \subsection{Feature preprocessing}
-\paragraph{Anonymisation} As before, the encounter and patient numbers will be removed for training.
+\paragraph{Anonymisation} As before, the encounter and patient numbers were removed for training.
 
-\paragraph{Missing values} In the filtered dataset, the features with most values missing are \textit{weight} (98.6\% missing) and \textit{medical specialty} (51.0\%), which I will not use for training. For other features, the missing values were imputed using median or constant strategy for numerical and categorical features respectively.
+\paragraph{Missing values} In the full dataset, the \textit{weight} feature was missing in 98.6\% of instances, and was not used for training. For other features, the missing values were imputed using median or constant strategy for numerical and categorical features respectively.
 
-\paragraph{Numerical and categorical features} Similar to processing in Assignment A: the features are converted to numerical or categorical values based on their meaning. Diagnoses are first grouped into categories to avoid a large number of features with small number of examples. The numerical and categorical features are normalised and one-hot encoded respectively.
+\paragraph{Numerical and categorical features} Similar to processing in Assignment A: the features were converted to numerical or categorical values based on their meaning. Diagnoses were first grouped into categories to avoid a large number of features with small number of examples. The numerical and categorical features were normalised and one-hot encoded respectively.
 
-\paragraph{Feature sets} Since the dataset is larger and the neural network models more powerful, I will train on the full feature set.
+\paragraph{Feature sets} Since the dataset is larger and the neural network models more powerful, I trained on the full feature set (except weight).
 
 \section{Machine learning set-up}
 
 \subsection{Train and test set split}
-This section describes measures taken to avoid data leakage between train and holdout sets and to train a generalisable model.
-
-\paragraph{Patient separation} In this assignment multiple encounters corresponding to the same patient will be used. To make sure the model does not identify and overfit to particular patients, the examples corresponding to the same patient should be either in training or holdout set but not both.
-
-TODO \paragraph{(some more specific criterion)} t-SNE has shown...
+With a view to get more generalisable model, I split the data into qualitatively different sets using a single-component t-SNE projection (at perplexity 30), holding out the top decile of values for testing. 
 
 
 \subsection{Probabilistic model}
 
-I model the predicted variable (length of next stay) using \textit{zero-truncated Poisson distribution} (ZTP). I truncate the zero because, if the follow-on visit happens, the length of stay must be at least 1, violating the assumptions of the regular Poisson distribution where observations of 0 are possible. The observations $y_i \in \mathbb{N}^+$ are therefore modelled using \[Y_i \sim \mathrm{ZTP}(f_\theta(x_i))\]
+I model the predicted variable (length of next stay) using \textit{zero-truncated Poisson distribution} (ZTP). I truncated the zero because, if the follow-on visit happens, the length of stay must be at least 1, violating the assumptions of the regular Poisson distribution where observations of 0 are possible. The observations $y_i \in \mathbb{N}^+$ are therefore modelled using \[Y_i \sim \mathrm{ZTP}(f_\theta(x_i))\]
 
 where 
 
@@ -133,23 +130,22 @@ where
 	\mathcal{L} = \sum\limits_{i=1}^{M} -y_i \log(f_\theta(x_i)) + \log(e^{f_\theta(x_i)} - 1) + \log(y_i!)
 \end{equation}
 
-Following the TensorFlow documentation on Poisson loss function,\footnote{\url{https://www.tensorflow.org/api_docs/python/tf/nn/log_poisson_loss}} to improve efficiency I will be computing the inexact version of this, emitting the constant $\log(y_i!)$ term.
+Following the TensorFlow documentation on Poisson loss function,\footnote{\url{https://www.tensorflow.org/api_docs/python/tf/nn/log_poisson_loss}} the training can be optimised computing the inexact version of this loss, omitting the constant $\log(y_i!)$ term.
 
 
 \section{Neural network architecture}
+I implemented a multilayer perceptron with two hidden layers of 64 and 32 units, with the sigmoid activation function as the non-linearity and used the Adam optimiser. 
 
-TODO description of neural network architecture
+\paragraph{Kernel initialisation} I used the kernel initialiser of \texttt{ones} which seemed to prevent the unstable initial state resulting in undefined floating point numbers, albeit with slightly slower convergence.
+
 
 
 \subsection{Hyperparameters}
-I generally tried to use the default hyperparameters. 
-
-The hyperparameters used for each classifier can be found in \texttt{training.ipynb} script.
+I used the default hyperparameters unless specified otherwise.
 
 \section{Results}
 TODO table and comparison of results, insights on which model is the best
 \subsection{Predictive power}
-TODO 5-fold cross-validation... 
 
 \subsection{Impact of PCA on training performance}
 
