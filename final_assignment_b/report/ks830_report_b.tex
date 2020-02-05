@@ -134,6 +134,16 @@ Following the TensorFlow documentation on Poisson loss function,\footnote{\url{h
 
 
 \section{Neural network architecture}
+TODO multiple architectures
+
+TODO recurrent neural networks
+
+TODO comparison on the number/width of hidden units 
+
+% You could just about squeeze in something, but it's not worth it --
+% the real point of this practical is "how to I put together a neural
+% network, and how does its design affect what it learns?"
+
 I implemented a multilayer perceptron with two hidden layers of 64 and 32 units, with the sigmoid activation function as the non-linearity and used the Adam optimiser. 
 
 \paragraph{Kernel initialisation} I used the kernel initialiser of \texttt{ones} which seemed to prevent the unstable initial state resulting in undefined floating point numbers, albeit with slightly slower convergence.
@@ -147,7 +157,13 @@ I used the default hyperparameters unless specified otherwise.
 TODO table and comparison of results, insights on which model is the best
 \subsection{Predictive power}
 
+\paragraph{Interpretation}
+
 \subsection{Impact of PCA on training performance}
+TODO what are the \textit{components} of PCA? Are they more useful in combining and representing features? — Look at previous assignment component breakdown.
+
+Does it speed training? \textbf{Why?}
+
 
 \section{Evaluation}
 TODO Evaluate the predictive power of the best model on the holdout set.
