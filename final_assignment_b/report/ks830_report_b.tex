@@ -99,13 +99,15 @@ Due to the nature of the prediction task, only the patients with at least two re
 \paragraph{Multiple readmission} Some patients have recorded follow-on visits even in cases when the readmission outcome is `NO' (e.g. at least 44 patients have been \textit{not readmitted more than once}). Further investigation would be necessary to determine the reason for this in order to handle it correctly—I decided to exclude any no-readmission encounters still left after filtering and length-of-next-stay feature generation. 
 
 \subsection{Feature preprocessing}
-\paragraph{Anonymisation} As before, the encounter and patient numbers were removed for training.
+\paragraph{Anonymisation} As before, the encounter and patient numbers were removed at training stage.
 
-\paragraph{Missing values} In the full dataset, the \textit{weight} feature was missing in 98.6\% of instances, and was not used for training. For other features, the missing values were imputed using median or constant strategy for numerical and categorical features respectively.
+TODO encounters might be important in RNNs?
 
-\paragraph{Numerical and categorical features} Similar to processing in Assignment A: the features were converted to numerical or categorical values based on their meaning. Diagnoses were first grouped into categories to avoid a large number of features with small number of examples. The numerical and categorical features were normalised and one-hot encoded respectively.
+\paragraph{Missing values} In the full dataset, the \textit{weight} feature was missing in 98.6\% of instances, so I excluded it from training. For other features, the missing values were imputed using median or constant strategy for numerical and categorical features respectively.
 
-\paragraph{Feature sets} Since the dataset is larger and the neural network models more powerful, I trained on the full feature set (except weight).
+\paragraph{Numerical and categorical features} Similar to processing in Assignment A: the features were converted to numerical or categorical values based on their meaning, and further normalised/one-hot encoded. To avoid a large number of features with small number of examples, the diagnoses were first compressed to broader categories (e.g. circulatory, respiratory, etc.)
+
+\paragraph{Feature sets} The main advantage of using the deep learning tools is their capacity to select the most useful features without the manual feature preprocessing by a data engineer. Therefore the models will be trained in an end-to-end manner on all features (as long as they are encoded and normalised for performance reasons).
 
 \section{Machine learning set-up}
 
@@ -168,6 +170,12 @@ TODO if results continue to be sh*t, then: current stay features are not enough 
 TODO what are the \textit{components} of PCA? Are they more useful in combining and representing features? — Look at previous assignment component breakdown.
 
 Does it speed training? \textbf{Why?}
+
+Pros. Training speed. Removing low-variance components definitely decrease memory, might have a variable effect on predictive power.
+
+Cons. More overfitting on an equivalent model. Therefore should take more care in applying better regularisation and dropout techniques. 
+
+
 
 
 \section{Evaluation}
