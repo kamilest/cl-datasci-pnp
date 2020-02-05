@@ -115,7 +115,7 @@ With a view to get more generalisable model, I split the data into qualitatively
 
 \subsection{Probabilistic model}
 
-I model the predicted variable (length of next stay) using \textit{zero-truncated Poisson distribution} (ZTP). I truncated the zero because, if the follow-on visit happens, the length of stay must be at least 1, violating the assumptions of the regular Poisson distribution where observations of 0 are possible. The observations $y_i \in \mathbb{N}^+$ are therefore modelled using \[Y_i \sim \mathrm{ZTP}(f_\theta(x_i))\]
+I model the predicted variable (length of next stay) using \textit{zero-truncated Poisson distribution} (ZTP). I truncated the zero because, if the follow-on visit happens, the length of stay must be at least 1, violating the assumptions of the regular Poisson distribution where observations of 0 are possible (on the other hand, I still allow prediction of more than 14 days). The observations $y_i \in \mathbb{N}^+$ are therefore modelled using \[Y_i \sim \mathrm{ZTP}(f_\theta(x_i))\]
 
 where 
 
@@ -133,12 +133,14 @@ where
 Following the TensorFlow documentation on Poisson loss function,\footnote{\url{https://www.tensorflow.org/api_docs/python/tf/nn/log_poisson_loss}} the training can be optimised computing the inexact version of this loss, omitting the constant $\log(y_i!)$ term.
 
 
-\section{Neural network architecture}
+\subsection{Neural network architecture}
 TODO multiple architectures
 
 TODO recurrent neural networks
 
 TODO comparison on the number/width of hidden units 
+
+TODO cross-validation for the unshuffled tSNE data? Select development sets by quantile. (although that does not necessarily give any \textit{more} insight to the \textit{reasons} behind the performance)
 
 % You could just about squeeze in something, but it's not worth it --
 % the real point of this practical is "how to I put together a neural
@@ -149,12 +151,14 @@ I implemented a multilayer perceptron with two hidden layers of 64 and 32 units,
 \paragraph{Kernel initialisation} I used the kernel initialiser of \texttt{ones} which seemed to prevent the unstable initial state resulting in undefined floating point numbers, albeit with slightly slower convergence.
 
 
-
-\subsection{Hyperparameters}
-I used the default hyperparameters unless specified otherwise.
+\paragraph{Hyperparameters} I used the default hyperparameters unless specified otherwise.
 
 \section{Results}
 TODO table and comparison of results, insights on which model is the best
+
+TODO if results continue to be sh*t, then: current stay features are not enough to predict the future length of stay. Medical emergencies are unpredictable in nature. Perhaps patients with 
+
+
 \subsection{Predictive power}
 
 \paragraph{Interpretation}
