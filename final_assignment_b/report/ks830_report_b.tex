@@ -112,7 +112,7 @@ The main advantage of using the deep learning tools is their capacity to select 
 \section{Machine learning set-up}
 
 \subsection{Train and test set split}
-With a view to get a more generalisable model, I split the data into qualitatively different sets using a single-component t-SNE projection (at perplexity 30), holding out the top decile of values for testing, and another decile for validation.
+With a view to get a more generalisable model, I split the data into qualitatively different sets using a single-component t-SNE projection (at perplexity 30), holding out the top 10\% of values for testing, and another 10\% for validation.
 
 \subsection{Probabilistic model}
 
@@ -138,6 +138,11 @@ which I will use for training, but additionally taking the average (multiplying 
 
 \section{Feedforward neural networks}
 Ideally, I wish to be able to predict the length of the follow-on visit for a patient from as little as a single encounter – the original dataset suggests that in majority (54\%) of cases this is indeed the most information that a hospital would have for a patient. For this task I implement a set of \textit{feedforward neural networks}.
+
+\subsection{Choice of architecture}
+Tempting to assume that the deeper the better – increased number of parameters should improve the predictive power of the neural networks.
+
+At the same time, if there is a simple model that is faster to train yet retains the same predictive power, there is no point in using the less efficient model. 
 
 \paragraph{Architecture description} Some initial architecture exploration has shown, as expected, that deeper and wider architectures tend to be more effective at this learning task but take longer to train (without much improvement in results). I settled in between those two constraints, implementing a network with 8 hidden layers of up to 1024 units, the ReLU activation function, and Adam optimiser with early stopping. 
 
