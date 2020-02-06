@@ -157,6 +157,10 @@ TODO table and comparison of results, insights on which model is the best
 
 TODO was regularisation and dropout effective
 
+Deeper networks additionally seem to suffer more from the \textit{vanishing gradient} problem, depending on the initialisation of the weights, and despite using the ReLU activation function that is commonly used to solve this problem.
+
+I have added batch normalisation between each layer, which made the outliers less common but did not completely resolve the issue. It also slowed the convergence: for the deep model, convergence took 4 times longer on average.
+
 
 \paragraph{Interpretation}
 Medical emergencies are unpredictable in nature. 
