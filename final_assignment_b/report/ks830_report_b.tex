@@ -96,16 +96,18 @@ Due to the nature of the prediction task, only the patients with at least two re
 
 \paragraph{Multiple examples} To ensure independence of all the examples in the dataset, I only used a single randomly sampled example per patient. 
 
-\paragraph{Multiple readmission} Some patients have recorded follow-on visits even in cases when the readmission outcome is `NO' (e.g. at least 44 patients have been \textit{not readmitted more than once}). Further investigation would be necessary to determine the reason for this in order to handle it correctly—I decided to exclude any no-readmission encounters still left after filtering and length-of-next-stay feature generation. 
+\paragraph{Multiple readmission} Some patients have recorded follow-on visits even in cases when the readmission outcome is `NO' (e.g. at least 44 patients have been \textit{not readmitted more than once}). Further investigation would be necessary to determine the reason for this in order to handle it correctly—I decided not to sample from any no-readmission encounters.
 
 \subsection{Feature preprocessing}
-\paragraph{Anonymisation} As before, the encounter and patient numbers were removed for training.
+\paragraph{Anonymisation} As before, the encounter and patient numbers were removed at training stage.
 
-\paragraph{Missing values} In the full dataset, the \textit{weight} feature was missing in 98.6\% of instances, and was not used for training. For other features, the missing values were imputed using median or constant strategy for numerical and categorical features respectively.
+TODO encounters might be important in RNNs?
 
-\paragraph{Numerical and categorical features} Similar to processing in Assignment A: the features were converted to numerical or categorical values based on their meaning. Diagnoses were first grouped into categories to avoid a large number of features with small number of examples. The numerical and categorical features were normalised and one-hot encoded respectively.
+\paragraph{Missing values} In the full dataset, the \textit{weight} feature was missing in 98.6\% of instances, so I excluded it from training. For other features, the missing values were imputed using median or constant strategy for numerical and categorical features respectively.
 
-\paragraph{Feature sets} Since the dataset is larger and the neural network models more powerful, I trained on the full feature set (except weight).
+\paragraph{Numerical and categorical features} Similar to processing in Assignment A: the features were converted to numerical or categorical values based on their meaning, and further normalised/one-hot encoded. To avoid a large number of features with small number of examples, the diagnoses were first compressed to broader categories (e.g. circulatory, respiratory, etc.)
+
+\paragraph{Feature sets} The main advantage of using the deep learning tools is their capacity to select the most useful features without the manual feature preprocessing by a data engineer. Therefore the models will be trained in an end-to-end manner on all features (as long as they are encoded and normalised for performance reasons).
 
 \section{Machine learning set-up}
 
@@ -115,7 +117,7 @@ With a view to get more generalisable model, I split the data into qualitatively
 
 \subsection{Probabilistic model}
 
-I model the predicted variable (length of next stay) using \textit{zero-truncated Poisson distribution} (ZTP). I truncated the zero because, if the follow-on visit happens, the length of stay must be at least 1, violating the assumptions of the regular Poisson distribution where observations of 0 are possible. The observations $y_i \in \mathbb{N}^+$ are therefore modelled using \[Y_i \sim \mathrm{ZTP}(f_\theta(x_i))\]
+I model the predicted variable (length of next stay) using \textit{zero-truncated Poisson distribution} (ZTP). I truncated the zero because, if the follow-on visit happens, the length of stay must be at least 1, violating the assumptions of the regular Poisson distribution where observations of 0 are possible (on the other hand, I still allow prediction of more than 14 days). The observations $y_i \in \mathbb{N}^+$ are therefore modelled using \[Y_i \sim \mathrm{ZTP}(f_\theta(x_i))\]
 
 where 
 
@@ -130,24 +132,53 @@ where
 	\mathcal{L} = \sum\limits_{i=1}^{M} -y_i \log(f_\theta(x_i)) + \log(e^{f_\theta(x_i)} - 1) + \log(y_i!)
 \end{equation}
 
-Following the TensorFlow documentation on Poisson loss function,\footnote{\url{https://www.tensorflow.org/api_docs/python/tf/nn/log_poisson_loss}} the training can be optimised computing the inexact version of this loss, omitting the constant $\log(y_i!)$ term.
+% Following the TensorFlow documentation on Poisson loss function,\footnote{\url{https://www.tensorflow.org/api_docs/python/tf/nn/log_poisson_loss}} the training can be optimised computing the inexact version of this loss, omitting the constant $\log(y_i!)$ term.
 
 
-\section{Neural network architecture}
+\subsection{Neural network architecture}
+TODO multiple architectures
+
+TODO recurrent neural networks
+
+TODO comparison on the number/width of hidden units 
+
+TODO cross-validation for the unshuffled tSNE data? Select development sets by quantile. (although that does not necessarily give any \textit{more} insight to the \textit{reasons} behind the performance)
+
+% You could just about squeeze in something, but it's not worth it --
+% the real point of this practical is "how to I put together a neural
+% network, and how does its design affect what it learns?"
+
 I implemented a multilayer perceptron with two hidden layers of 64 and 32 units, with the sigmoid activation function as the non-linearity and used the Adam optimiser. 
 
 \paragraph{Kernel initialisation} I used the kernel initialiser of \texttt{ones} which seemed to prevent the unstable initial state resulting in undefined floating point numbers, albeit with slightly slower convergence.
 
 
-
-\subsection{Hyperparameters}
-I used the default hyperparameters unless specified otherwise.
+\paragraph{Hyperparameters} I used the default hyperparameters unless specified otherwise.
 
 \section{Results}
 TODO table and comparison of results, insights on which model is the best
+
+TODO was regularisation and dropout effective
+
+
 \subsection{Predictive power}
 
+\paragraph{Interpretation}
+TODO if results continue to be sh*t, then: current stay features are not enough to predict the future length of stay. Medical emergencies are unpredictable in nature. 
+
+TODO Perhaps patients with 
+
 \subsection{Impact of PCA on training performance}
+TODO what are the \textit{components} of PCA? Are they more useful in combining and representing features? — Look at previous assignment component breakdown.
+
+Does it speed training? \textbf{Why?}
+
+Pros. Training speed. Removing low-variance components definitely decrease memory, might have a variable effect on predictive power.
+
+Cons. More overfitting on an equivalent model. Therefore should take more care in applying better regularisation and dropout techniques. 
+
+
+
 
 \section{Evaluation}
 TODO Evaluate the predictive power of the best model on the holdout set.
