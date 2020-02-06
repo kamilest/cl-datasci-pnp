@@ -92,68 +92,60 @@ I use the raw data (\textit{diabetic\_data\_original.csv}) of the same medical c
 The preprocessing steps below resulted in 16515 training instances.
 
 \paragraph{Filtering}
-Due to the nature of the prediction task, only the patients with at least two recorded encounters were considered. For each patient, I did not use the last encounter as a datapoint because the ground truth (the length of next stay) for it is unknown: either the patient was not readmitted (we did not observe the counterfactual result of how long the stay would have been had the patient been readmitted), or the patient was readmitted but the ground truth for this has not been recorded. 
+Due to the nature of the prediction task, only the patients with at least two recorded encounters were considered – the later encounter is used to generate the label for the earlier one, and the last encounter does not have a known label. 
 
-\paragraph{Multiple examples} To ensure independence of all the examples in the dataset, I only used a single randomly sampled example per patient. 
+\paragraph{Multiple readmission} Taking a closer look at the dataset has shown that some patients have recorded follow-on visits even in cases when the readmission outcome was `NO' (for example, at least 44 patients have been \textit{not readmitted more than once}). Further investigation would be necessary to determine the reason for this (e.g. human error, admission to another hospital,...) in order to handle it correctly. I decided to not sample from any no-readmission encounters (of which after initial filtering there were 490).
 
-\paragraph{Multiple readmission} Some patients have recorded follow-on visits even in cases when the readmission outcome is `NO' (e.g. at least 44 patients have been \textit{not readmitted more than once}). Further investigation would be necessary to determine the reason for this in order to handle it correctly—I decided not to sample from any no-readmission encounters.
+\paragraph{Multiple examples} To ensure independence of all examples in the dataset (corresponding to the assumptions of the probabilistic model described below), I only used a single randomly sampled example per patient (with the constraints described above). 
 
 \subsection{Feature preprocessing}
-\paragraph{Anonymisation} As before, the encounter and patient numbers were removed at training stage.
 
-TODO encounters might be important in RNNs?
+The main advantage of using the deep learning tools is their capacity to select the most useful features without any manual feature preprocessing by a data engineer. For this reason, the models will be trained in an end-to-end manner on all features, but with the following considerations.
+
+\paragraph{Anonymisation} As before, the encounter and patient numbers were removed at training stage.
 
 \paragraph{Missing values} In the full dataset, the \textit{weight} feature was missing in 98.6\% of instances, so I excluded it from training. For other features, the missing values were imputed using median or constant strategy for numerical and categorical features respectively.
 
-\paragraph{Numerical and categorical features} Similar to processing in Assignment A: the features were converted to numerical or categorical values based on their meaning, and further normalised/one-hot encoded. To avoid a large number of features with small number of examples, the diagnoses were first compressed to broader categories (e.g. circulatory, respiratory, etc.)
+\paragraph{Numerical and categorical features} Similar to processing in Assignment A: the features were converted to numerical or categorical values based on their meaning, and further normalised/one-hot encoded for performance reasons. To avoid a large number of features with small number of examples, the diagnoses were first compressed to broader categories (e.g. circulatory, respiratory, etc.)
 
-\paragraph{Feature sets} The main advantage of using the deep learning tools is their capacity to select the most useful features without the manual feature preprocessing by a data engineer. Therefore the models will be trained in an end-to-end manner on all features (as long as they are encoded and normalised for performance reasons).
 
 \section{Machine learning set-up}
 
 \subsection{Train and test set split}
-With a view to get more generalisable model, I split the data into qualitatively different sets using a single-component t-SNE projection (at perplexity 30), holding out the top decile of values for testing. 
-
+With a view to get a more generalisable model, I split the data into qualitatively different sets using a single-component t-SNE projection (at perplexity 30), holding out the top decile of values for testing, and another decile for validation.
 
 \subsection{Probabilistic model}
 
-I model the predicted variable (length of next stay) using \textit{zero-truncated Poisson distribution} (ZTP). I truncated the zero because, if the follow-on visit happens, the length of stay must be at least 1, violating the assumptions of the regular Poisson distribution where observations of 0 are possible (on the other hand, I still allow prediction of more than 14 days). The observations $y_i \in \mathbb{N}^+$ are therefore modelled using \[Y_i \sim \mathrm{ZTP}(f_\theta(x_i))\]
+I model the predicted variable (length of next stay) using \textit{zero-truncated Poisson distribution} (ZTP). I truncated the zero because, if the follow-on visit happens, the length of stay must be at least 1, violating the assumptions of the regular Poisson distribution where observations of 0 are possible (on the other hand, I still allow predictions of more than 14 days that were not observed in the dataset but in theory should be possible). The observations $y_i \in \mathbb{N}^+$ therefore follow \[Y_i \sim \mathrm{ZTP}(f_\theta(x_i))\]
 
-where 
+with probability mass function 
 
 \begin{equation}
 	\mathbb{P}[Y_i = y_i] = \frac{f_\theta(x_i)^{y_i}}{(e^{f_\theta(x_i)} - 1)y_i!}.
 	\label{eq1}
 \end{equation}
 
-\paragraph{Loss function} For $M$ examples, parameters $\theta$ maximising the probability of the dataset (expressed as the product of probabilities in (\ref{eq1}) for each observation) minimise the following loss function:
+\paragraph{Loss function} For $M$ examples, parameters $\theta$ maximising the probability of the dataset (expressed as the product of probabilities in (\ref{eq1}) for each observation, assuming independence) minimise the loss function
 
 \begin{equation}
 	\mathcal{L} = \sum\limits_{i=1}^{M} -y_i \log(f_\theta(x_i)) + \log(e^{f_\theta(x_i)} - 1) + \log(y_i!)
 \end{equation}
 
+which I will use for training, but additionally taking the average (multiplying $\mathcal{L}$ by constant $1/M$).
+
 % Following the TensorFlow documentation on Poisson loss function,\footnote{\url{https://www.tensorflow.org/api_docs/python/tf/nn/log_poisson_loss}} the training can be optimised computing the inexact version of this loss, omitting the constant $\log(y_i!)$ term.
 
 
-\subsection{Neural network architecture}
-TODO multiple architectures
+\section{Feedforward neural networks}
+I wish to be able to predict the length of the follow-on visit for a patient using the data of just one encounter, since the original dataset suggests that in majority (54\%) of cases this is indeed the most information that a hospital would have when trying to efficiently manage its resources. For this task I implement a \textit{feedforward neural network} architecture.
 
-TODO recurrent neural networks
+\paragraph{Architecture description} Some initial architecture exploration has shown, as expected, that deeper and wider architectures tend to be more effective at this learning task but take longer to train (without much improvement in results). I settled in between those two constraints, implementing a network with 8 hidden layers of up to 1024 units, the ReLU activation function, and Adam optimiser with early stopping. 
 
-TODO comparison on the number/width of hidden units 
-
-TODO cross-validation for the unshuffled tSNE data? Select development sets by quantile. (although that does not necessarily give any \textit{more} insight to the \textit{reasons} behind the performance)
 
 % You could just about squeeze in something, but it's not worth it --
 % the real point of this practical is "how to I put together a neural
 % network, and how does its design affect what it learns?"
 
-I implemented a multilayer perceptron with two hidden layers of 64 and 32 units, with the sigmoid activation function as the non-linearity and used the Adam optimiser. 
-
-\paragraph{Kernel initialisation} I used the kernel initialiser of \texttt{ones} which seemed to prevent the unstable initial state resulting in undefined floating point numbers, albeit with slightly slower convergence.
-
-
-\paragraph{Hyperparameters} I used the default hyperparameters unless specified otherwise.
 
 \section{Results}
 TODO table and comparison of results, insights on which model is the best
@@ -162,6 +154,7 @@ TODO was regularisation and dropout effective
 
 
 \subsection{Predictive power}
+MAIN FUCKING INSIGHT THE SIMPLER U GO THE BETTER FFS
 
 \paragraph{Interpretation}
 TODO if results continue to be sh*t, then: current stay features are not enough to predict the future length of stay. Medical emergencies are unpredictable in nature. 
