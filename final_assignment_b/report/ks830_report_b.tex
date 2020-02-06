@@ -137,7 +137,7 @@ which I will use for training, but additionally taking the average (multiplying 
 
 
 \section{Feedforward neural networks}
-I wish to be able to predict the length of the follow-on visit for a patient using the data of just one encounter, since the original dataset suggests that in majority (54\%) of cases this is indeed the most information that a hospital would have when trying to efficiently manage its resources. For this task I implement a \textit{feedforward neural network} architecture.
+Ideally, I wish to be able to predict the length of the follow-on visit for a patient from as little as a single encounter – the original dataset suggests that in majority (54\%) of cases this is indeed the most information that a hospital would have for a patient. For this task I implement a set of \textit{feedforward neural networks}.
 
 \paragraph{Architecture description} Some initial architecture exploration has shown, as expected, that deeper and wider architectures tend to be more effective at this learning task but take longer to train (without much improvement in results). I settled in between those two constraints, implementing a network with 8 hidden layers of up to 1024 units, the ReLU activation function, and Adam optimiser with early stopping. 
 
@@ -153,24 +153,17 @@ TODO table and comparison of results, insights on which model is the best
 TODO was regularisation and dropout effective
 
 
-\subsection{Predictive power}
-MAIN FUCKING INSIGHT THE SIMPLER U GO THE BETTER FFS
-
 \paragraph{Interpretation}
-TODO if results continue to be sh*t, then: current stay features are not enough to predict the future length of stay. Medical emergencies are unpredictable in nature. 
+Medical emergencies are unpredictable in nature. 
 
-TODO Perhaps patients with 
 
 \subsection{Impact of PCA on training performance}
-TODO what are the \textit{components} of PCA? Are they more useful in combining and representing features? — Look at previous assignment component breakdown.
 
 Does it speed training? \textbf{Why?}
 
 Pros. Training speed. Removing low-variance components definitely decrease memory, might have a variable effect on predictive power.
 
 Cons. More overfitting on an equivalent model. Therefore should take more care in applying better regularisation and dropout techniques. 
-
-
 
 
 \section{Evaluation}
