@@ -96,7 +96,7 @@ Due to the nature of the prediction task, only the patients with at least two re
 
 \paragraph{Multiple examples} To ensure independence of all the examples in the dataset, I only used a single randomly sampled example per patient. 
 
-\paragraph{Multiple readmission} Some patients have recorded follow-on visits even in cases when the readmission outcome is `NO' (e.g. at least 44 patients have been \textit{not readmitted more than once}). Further investigation would be necessary to determine the reason for this in order to handle it correctly—I decided to exclude any no-readmission encounters still left after filtering and length-of-next-stay feature generation. 
+\paragraph{Multiple readmission} Some patients have recorded follow-on visits even in cases when the readmission outcome is `NO' (e.g. at least 44 patients have been \textit{not readmitted more than once}). Further investigation would be necessary to determine the reason for this in order to handle it correctly—I decided not to sample from any no-readmission encounters.
 
 \subsection{Feature preprocessing}
 \paragraph{Anonymisation} As before, the encounter and patient numbers were removed at training stage.
@@ -132,7 +132,7 @@ where
 	\mathcal{L} = \sum\limits_{i=1}^{M} -y_i \log(f_\theta(x_i)) + \log(e^{f_\theta(x_i)} - 1) + \log(y_i!)
 \end{equation}
 
-Following the TensorFlow documentation on Poisson loss function,\footnote{\url{https://www.tensorflow.org/api_docs/python/tf/nn/log_poisson_loss}} the training can be optimised computing the inexact version of this loss, omitting the constant $\log(y_i!)$ term.
+% Following the TensorFlow documentation on Poisson loss function,\footnote{\url{https://www.tensorflow.org/api_docs/python/tf/nn/log_poisson_loss}} the training can be optimised computing the inexact version of this loss, omitting the constant $\log(y_i!)$ term.
 
 
 \subsection{Neural network architecture}
@@ -158,13 +158,15 @@ I implemented a multilayer perceptron with two hidden layers of 64 and 32 units,
 \section{Results}
 TODO table and comparison of results, insights on which model is the best
 
-
+TODO was regularisation and dropout effective
 
 
 \subsection{Predictive power}
 
 \paragraph{Interpretation}
-TODO if results continue to be sh*t, then: current stay features are not enough to predict the future length of stay. Medical emergencies are unpredictable in nature. Perhaps patients with 
+TODO if results continue to be sh*t, then: current stay features are not enough to predict the future length of stay. Medical emergencies are unpredictable in nature. 
+
+TODO Perhaps patients with 
 
 \subsection{Impact of PCA on training performance}
 TODO what are the \textit{components} of PCA? Are they more useful in combining and representing features? — Look at previous assignment component breakdown.
