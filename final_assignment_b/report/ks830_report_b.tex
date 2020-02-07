@@ -200,13 +200,13 @@ However, it is curious that even 6 million trainable parameters are not enough t
 
 The training times using those techniques are shown in Table \ref{g2}. While it is possible that PCA could help with speeding up training, the improvement is not guaranteed – for the moderate network, PCA and rPCA only increased the training time. Even more importantly, PCA could not compensate for the overhead of having a bigger network: the shallow network running on the original feature set is still much faster than the deeper counterparts running on PCA features. The takeaway from this is that, for the purpose of decreasing the training time, we should worry about simplifying the network architecture first, and only then consider any fancy dimensionality reduction techniques.
 
-On the other hand, we might be interested in using PCA techniques to improve the predictive power rather than the training time. However, while PCA-transformed features gave slightly better development set correlations for deeper networks (Table \ref{g3}), it was not the case for the shallow network, showing once again that PCA is not a magic formula we can use for an instant performance boost.
+On the other hand, we might be interested in using PCA techniques to improve the predictive power rather than the training time, since the transformed features “should” be useful. However, while PCA-transformed features gave slightly better average development set correlations for deeper networks (Table \ref{g3}), it was not the case for the shallow network, showing once again that PCA is not a magic formula we can use for an instant performance boost.
 
-rPCA seems to be particularly ineffective. Not only did it generally \textit{increase} the training time, but with the information loss from the excluded low-variance components it also tended to learn less, as demonstrated in Table \ref{g3}. In addition, unless even more layers are decreased in size (i.e. the overall model is reduced in addition to using fewer PCA components), the improvement in memory usage is relatively low. 
+rPCA seems to be particularly ineffective. Not only did it generally \textit{increase} the training time, but with the information loss from the excluded low-variance components, it also tended to learn less, as demonstrated in Table \ref{g3}. In addition, unless even more layers are decreased in size (i.e. the overall model is reduced in addition to using fewer PCA components), the improvement in memory usage is relatively low. 
 
 
 \section{Evaluation}
-The analysis above has shown that the 
+From the above analysis I have decided that it is the simplest model – the \textit{shallow} network without any PCA preprocessing – is actually the most promising one, both with respect to the training time and the generalisation (based on development set performance). I test it on the hold-out test set to get the correlation of ....
 
 
 \medskip
