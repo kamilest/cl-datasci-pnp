@@ -136,36 +136,65 @@ which I will use for training, but additionally taking the average (multiplying 
 \section{Feedforward neural networks}
 Ideally, I wish to be able to predict the length of the follow-on visit for a patient from as little as a single encounter rather than considering the encounter sequences: the original dataset suggests that in majority (54\%) of cases this is indeed the most information that a hospital would have for a patient. (It would also be unclear how to handle the multiple readmission anomalies for encounter sequences to be correct.)
 
-For this task I implement a set of \textit{feedforward neural networks}.
+For this task I implement a set of feedforward neural networks.
 
 \subsection{Choice of architecture}
-It is tempting to assume that the deeper the neural network, the better, since with more parameters it has higher capacity to learn complex feature representations, even though potentially taking longer to train. 
+It is tempting to assume that the deeper the neural network, the better, since with more parameters the model has a higher capacity to learn complex feature representations (although taking longer to train). 
 
-As part of the hyperparameter selection process for the final model, I implemented three types of networks, which I will call \textit{deep}, \textit{moderate} and \textit{shallow}, containing around $6\times 10^6$, $3.5\times 10^6$ and 280,000 trainable parameters respectively (full specification can be found in supplementary code). To compare their typical performance, I trained each of them 5 times with early stopping, measuring the time it takes for the models to converge, and evaluating the predictions using Pearson's correlation $r$.
+To test this assumption and as part of the hyperparameter selection process, I implemented three types of networks, which I will call \textit{deep}, \textit{moderate} and \textit{shallow}, containing around $6\times 10^6$, $3.5\times 10^6$ and 280,000 trainable parameters respectively. Full specification (and training results) can be found in supplementary code. 
 
-\paragraph{Vanishing gradients} During training, the networks (especially deeper ones) tended to suffer from the vanishing gradients problem, getting stuck with unlucky initialisation (about once in every five runs). Adding batch normalisation between layers (which rescales the parameters, preventing them from getting too small) and using ReLU activation function resolved the issue.
+\paragraph{Selection process} To compare their typical performance, I trained each of the networks 5 times with early stopping, measuring the average time it takes for the models to converge, and evaluating the training and development set predictions using Pearson's correlation coefficient $r$. I chose this metric as being arguably easier to interpret compared to the custom loss function.
+
+\paragraph{Vanishing gradients} During training, the networks (especially deeper ones) tended to suffer from the vanishing gradients problem, getting stuck with unlucky initialisations (about once in every five runs). Adding batch normalisation between layers and using ReLU activation function resolved this issue, albeit increasing the training times by a factor of 2 to 4 (depending on configuration). 
+
+\begin{table}[]
+	\begin{tabularx}{\linewidth}{XXXX}
+		\hline
+				& \textbf{deep} & \textbf{moderate} & \textbf{shallow}\\ \hline
+		time, s     & 276   & 84  & 35 \\
+		train $r$ & 0.208 & 0.376 & 0.458 \\
+		dev. $r$ & 0.127 & 0.178 & 0.207
+		\end{tabularx}
+\caption{Mean training time with mean training and development set performance of feedforward neural networks.}\label{g1}
+\end{table}
 
 \subsection{Results}
+The results, presented in Table \ref{g1}, seem to suggest that deeper networks are, in fact, not always better. With an almost 8-fold increase in training time and lower correlations on both training and development datasets, this particular experiment suggests that deeper networks might, contrary to the assumption, give even worse predictions than the simpler models. 
+
+However, it is curious that even 6 million trainable parameters are not enough to actually (over)fit the training data and give correlations closer to 1 (despite early stopping preventing the model from doing this). Whether this is a fundamental limitation of the dataset (with no useful signal for length of stay prediction), or the lack of hyperparameter optimisation would need a further investigation to determine.
+
+\subsection{Using PCA features as input}
+One possible way to mitigate the slow training times (especially for the \textit{deep} and \textit{moderate} models) could be the use of PCA components as input features, hopefully saving some time on learning a useful feature representation. At the same time, if PCA is capable to extract the most useful features with its first few components, it could also be used to effectively reduce the input dimensions, in turn reducing the model size and training time. 
+
+I test the effectiveness of PCA on training 
+
+\begin{table}[]
+	\begin{tabularx}{\linewidth}{XXXX}
+		\hline
+				& \textbf{full} & \textbf{PCA} & \textbf{rPCA}\\ \hline
+		deep    & 276   & 237  & 269 \\
+		moderate  & 84 & 85 & 88 \\
+		shallow & 35 & 20 & 20
+		\end{tabularx}
+\caption{Mean training time on full, PCA and reduced PCA feature sets.}\label{g2}
+\end{table}
+
+\begin{table}[]
+	\begin{tabularx}{\linewidth}{XXXX}
+		\hline
+				& \textbf{full} & \textbf{PCA} & \textbf{rPCA}\\ \hline
+		deep    & 0.127   & 0.168  & 0.116 \\
+		moderate  & 0.178 & 0.210 & 0.191 \\
+		shallow & 0.207 & 0.193 & 0.149
+		\end{tabularx}
+\caption{Mean development set correlations when training on full, PCA and reduced PCA feature sets.}\label{g2}
+\end{table}
 
 
-Deeper networks 
 
-
-\paragraph{Interpretation}
-Medical emergencies are unpredictable in nature. 
-
-
-\subsection{Impact of PCA on learning effectiveness}
-
-Does it speed training? \textbf{Why?}
-
-Pros. Training speed. Removing low-variance components definitely decrease memory, might have a variable effect on predictive power.
-
-Cons. More overfitting on an equivalent model. Therefore should take more care in applying better regularisation and dropout techniques. 
-\paragraph{Interpretation}
 
 \section{Evaluation}
-TODO Evaluate the predictive power of the best model on the holdout set.
+
 
 
 \medskip
