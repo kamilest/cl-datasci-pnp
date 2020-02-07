@@ -80,7 +80,8 @@
 \large
 Kamilė Stankevičiūtė (\texttt{ks830}) \\ Gonville \& Caius College \\[4mm]
 
-? words
+\today \\[4mm]
+1493 words
 \end{center} \vskip10mm}]
 
 
@@ -92,97 +93,127 @@ I use the raw data (\textit{diabetic\_data\_original.csv}) of the same medical c
 The preprocessing steps below resulted in 16515 training instances.
 
 \paragraph{Filtering}
-Due to the nature of the prediction task, only the patients with at least two recorded encounters were considered. For each patient, I did not use the last encounter as a datapoint because the ground truth (the length of next stay) for it is unknown: either the patient was not readmitted (we did not observe the counterfactual result of how long the stay would have been had the patient been readmitted), or the patient was readmitted but the ground truth for this has not been recorded. 
+Only the patients with at least two recorded encounters were considered, since the later encounter is required to generate the label for the earlier one. To ensure independence of all examples in the dataset (corresponding to the assumptions of the probabilistic model described below), only one randomly sampled example per patient was used.
 
-\paragraph{Multiple examples} To ensure independence of all the examples in the dataset, I only used a single randomly sampled example per patient. 
-
-\paragraph{Multiple readmission} Some patients have recorded follow-on visits even in cases when the readmission outcome is `NO' (e.g. at least 44 patients have been \textit{not readmitted more than once}). Further investigation would be necessary to determine the reason for this in order to handle it correctly—I decided not to sample from any no-readmission encounters.
+\paragraph{Multiple readmission} Taking a closer look at the dataset has shown that some patients have recorded follow-on visits even in cases when the readmission outcome was `NO' (for example, at least 44 patients have been \textit{not readmitted more than once}). Further investigation would be necessary to determine the reason for this (e.g. human error, admission to another hospital,...) in order to handle it correctly. I decided to not sample from any no-readmission encounters (of which after initial filtering there were 490).
 
 \subsection{Feature preprocessing}
-\paragraph{Anonymisation} As before, the encounter and patient numbers were removed at training stage.
 
-TODO encounters might be important in RNNs?
+The main advantage of using the deep learning tools is their capacity to select the most useful features without manual feature engineering by the analyst. For this reason, the models will be trained in an end-to-end manner on all features, but with the following considerations.
+
+\paragraph{Anonymisation} As before, the encounter and patient numbers were removed at training stage.
 
 \paragraph{Missing values} In the full dataset, the \textit{weight} feature was missing in 98.6\% of instances, so I excluded it from training. For other features, the missing values were imputed using median or constant strategy for numerical and categorical features respectively.
 
-\paragraph{Numerical and categorical features} Similar to processing in Assignment A: the features were converted to numerical or categorical values based on their meaning, and further normalised/one-hot encoded. To avoid a large number of features with small number of examples, the diagnoses were first compressed to broader categories (e.g. circulatory, respiratory, etc.)
+\paragraph{Numerical and categorical features} As before, the features were converted to numerical or categorical values based on their meaning, and further normalised/one-hot encoded for performance reasons. To avoid a large number of sparse features, the diagnoses were compressed to broader categories (e.g. circulatory, respiratory, etc.)
 
-\paragraph{Feature sets} The main advantage of using the deep learning tools is their capacity to select the most useful features without the manual feature preprocessing by a data engineer. Therefore the models will be trained in an end-to-end manner on all features (as long as they are encoded and normalised for performance reasons).
 
 \section{Machine learning set-up}
 
 \subsection{Train and test set split}
-With a view to get more generalisable model, I split the data into qualitatively different sets using a single-component t-SNE projection (at perplexity 30), holding out the top decile of values for testing. 
-
+With a view to get a more generalisable model, I split the data into qualitatively different sets using a single-component t-SNE projection (perplexity=30), holding out the top 10\% of values for testing, and another 10\% for validation.
 
 \subsection{Probabilistic model}
+I model length of next stay using \textit{zero-truncated Poisson distribution} (ZTP). I truncated the zero because, if the follow-on visit happens, the length of stay must be at least 1, violating the assumptions of the regular Poisson distribution where observations of 0 are possible (on the other hand, I still allow predictions of more than 14 days that were not observed in the dataset but in theory should be possible). The observations $y_i \in \mathbb{N}^+$ therefore follow \[Y_i \sim \mathrm{ZTP}(f_\theta(x_i))\]
 
-I model the predicted variable (length of next stay) using \textit{zero-truncated Poisson distribution} (ZTP). I truncated the zero because, if the follow-on visit happens, the length of stay must be at least 1, violating the assumptions of the regular Poisson distribution where observations of 0 are possible (on the other hand, I still allow prediction of more than 14 days). The observations $y_i \in \mathbb{N}^+$ are therefore modelled using \[Y_i \sim \mathrm{ZTP}(f_\theta(x_i))\]
-
-where 
+with probability mass function 
 
 \begin{equation}
-	\mathbb{P}[Y_i = y_i] = \frac{f_\theta(x_i)^{y_i}}{(e^{f_\theta(x_i)} - 1)y_i!}.
+	\mathbb{P}[Y_i = y_i | \theta, x_i] = \frac{f_\theta(x_i)^{y_i}}{(e^{f_\theta(x_i)} - 1)y_i!}.
 	\label{eq1}
 \end{equation}
 
-\paragraph{Loss function} For $M$ examples, parameters $\theta$ maximising the probability of the dataset (expressed as the product of probabilities in (\ref{eq1}) for each observation) minimise the following loss function:
+\paragraph{Loss function} For $M$ examples, parameters $\theta$ maximising the probability of the dataset (expressed as the product of probabilities in (\ref{eq1}) for each observation, assuming independence) minimise the loss function
 
 \begin{equation}
 	\mathcal{L} = \sum\limits_{i=1}^{M} -y_i \log(f_\theta(x_i)) + \log(e^{f_\theta(x_i)} - 1) + \log(y_i!)
 \end{equation}
 
+which I will use for training, but additionally taking the average (multiplying $\mathcal{L}$ by constant $1/M$).
+
 % Following the TensorFlow documentation on Poisson loss function,\footnote{\url{https://www.tensorflow.org/api_docs/python/tf/nn/log_poisson_loss}} the training can be optimised computing the inexact version of this loss, omitting the constant $\log(y_i!)$ term.
 
 
-\subsection{Neural network architecture}
-TODO multiple architectures
+\section{Feedforward neural networks}
+Ideally, I wish to be able to predict the length of the follow-on visit for a patient from as little as a single encounter rather than sequences of multiple encounters: the original dataset suggests that in majority (54\%) of cases this is indeed the most information that a hospital would have for a patient. (It is also unclear how to handle the multiple readmission anomalies, mentioned above, for the encounter sequences to be correct.)
 
-TODO recurrent neural networks
+For this task I implement a set of feedforward neural networks.
 
-TODO comparison on the number/width of hidden units 
+\subsection{Choice of architecture}
+It is tempting to assume that the deeper the neural network, the better, since with more parameters the model has a higher capacity to learn more complex feature representations (but taking longer to train). 
 
-TODO cross-validation for the unshuffled tSNE data? Select development sets by quantile. (although that does not necessarily give any \textit{more} insight to the \textit{reasons} behind the performance)
+To test this assumption and as part of the hyperparameter selection process, I implemented three types of networks, which I will call \textit{deep}, \textit{moderate} and \textit{shallow}, containing around $6\times 10^6$, $3.5\times 10^6$ and 280,000 trainable parameters respectively. Full specification (and the training results) can be found in supplementary code. 
 
-% You could just about squeeze in something, but it's not worth it --
-% the real point of this practical is "how to I put together a neural
-% network, and how does its design affect what it learns?"
+\paragraph{Selection process} To compare their typical performance, I trained each of the networks 5 times with early stopping, measuring the average time it takes for the models to converge, and evaluating the training and development set predictions using Pearson's correlation coefficient $r$. I chose this metric as being arguably easier to interpret compared to the custom loss function.
 
-I implemented a multilayer perceptron with two hidden layers of 64 and 32 units, with the sigmoid activation function as the non-linearity and used the Adam optimiser. 
+\paragraph{Vanishing gradients} During training, the networks (especially deeper ones) tended to suffer from the vanishing gradients problem, getting stuck with unlucky initialisations about once in every five runs. Adding batch normalisation between layers and using ReLU activation function resolved this issue, but sacrificed the training speed. 
 
-\paragraph{Kernel initialisation} I used the kernel initialiser of \texttt{ones} which seemed to prevent the unstable initial state resulting in undefined floating point numbers, albeit with slightly slower convergence.
+\begin{table}[]
+	\begin{tabularx}{\linewidth}{XXXX}
+		\hline
+				& \textbf{deep} & \textbf{moderate} & \textbf{shallow}\\ \hline
+		time, s     & 276   & 84  & 35 \\
+		epochs & 13.8 & 7.4 & 9.4 \\
+		train $r$ & 0.208 & 0.376 & 0.458 \\
+		dev. $r$ & 0.127 & 0.178 & 0.207
+		\end{tabularx}
+\caption{Mean training time, number of epochs to early stopping convergence, and training and development set performance of feedforward neural networks.}\label{g1}
+\end{table}
 
+\subsection{Results}
+The results, presented in Table \ref{g1}, seem to suggest that deeper networks are, in fact, not always better. With an almost 8-fold increase in training time and lower correlations on both training and development datasets, this particular experiment suggests that deeper networks might, contrary to the assumption, give even worse predictions than the simpler models. Moreover, since the models are trained with early stopping, the number of epochs themselves (not just the time they take) could also be used to compare the convergence speed. In this case the deep network required the most steps on average, indicating its slow convergence.
 
-\paragraph{Hyperparameters} I used the default hyperparameters unless specified otherwise.
+However, it is curious that even 6 million trainable parameters are not enough to actually fit the training data better and give correlations closer to 1, despite early stopping preventing the model from doing this. Determining whether this is a fundamental limitation of the dataset (with no useful signal for length of stay prediction), or the lack of hyperparameter optimisation would need further investigation that is out of this report's scope.
 
-\section{Results}
-TODO table and comparison of results, insights on which model is the best
+\subsection{Using PCA features as input}
+\paragraph{Motivation} One possible way to mitigate the slow training times (especially for the \textit{deep} and \textit{moderate} models) could be to use PCA components as input features, hopefully saving some time on learning a useful feature representation. At the same time, if PCA is capable to extract the most useful features with its first few components, it could also be used to effectively reduce the input dimensions, in turn reducing the model size and training time. 
 
-TODO was regularisation and dropout effective
+\paragraph{Experiments} I test the impact of PCA on neural network performance using a similar experimental set-up to the previous section, comparing the training time and development set predictions on the full feature representation, the PCA features of the same dimensionality and the \textit{reduced} PCA (rPCA) feature set which only considers the first half of the PCA components (with the assumption that they are the most useful).
 
+% \begin{figure*}[htb!]
+% 	\centering
+% 	\includegraphics[width=\textwidth]{figures/pc2.png}
+% 	\caption{Impact of PCA feature sets on neural network performance.}\label{pca}
+% \end{figure*}
 
-\subsection{Predictive power}
+\paragraph{Results} 
+\begin{table}[]
+	\begin{tabularx}{\linewidth}{XXXX}
+		\hline
+				& \textbf{full} & \textbf{PCA} & \textbf{rPCA}\\ \hline
+		deep    & 276   & 237  & 269 \\
+		moderate  & 84 & 85 & 88 \\
+		shallow & 35 & 20 & 20
+		\end{tabularx}
+\caption{Mean training time on raw, PCA and reduced PCA feature sets.}\label{g2}
+\end{table}
 
-\paragraph{Interpretation}
-TODO if results continue to be sh*t, then: current stay features are not enough to predict the future length of stay. Medical emergencies are unpredictable in nature. 
+\begin{table}[]
+	\begin{tabularx}{\linewidth}{XXXX}
+		\hline
+				& \textbf{full} & \textbf{PCA} & \textbf{rPCA}\\ \hline
+		deep    & 0.127   & 0.168  & 0.116 \\
+		moderate  & 0.178 & 0.210 & 0.191 \\
+		shallow & 0.207 & 0.193 & 0.149
+		\end{tabularx}
+\caption{Mean development set correlations when training on full, PCA and reduced PCA feature sets.}\label{g3}
+\end{table}
 
-TODO Perhaps patients with 
+The training times using those techniques are shown in Table \ref{g2}. While it is possible that PCA could help with speeding up training, the improvement is not guaranteed – for the moderate network, PCA and rPCA only increased the training time. Even more importantly, PCA could not compensate for the overhead of having a bigger network: the shallow network running on the original feature set is still much faster than the deeper counterparts running on PCA features. The takeaway from this is that, for the purpose of decreasing the training time, we should worry about simplifying the network architecture first, and only then consider any fancy dimensionality reduction techniques.
 
-\subsection{Impact of PCA on training performance}
-TODO what are the \textit{components} of PCA? Are they more useful in combining and representing features? — Look at previous assignment component breakdown.
+On the other hand, we might be interested in using PCA techniques to improve the predictive power rather than the training time, assuming the usefulness of PCA representation. However, while PCA-transformed features gave slightly better average development set correlations for deeper networks (Table \ref{g3}), it was not the case for the shallow network, showing once again that PCA is not a magic formula we can use for an instant performance or predictive power boost.
 
-Does it speed training? \textbf{Why?}
+rPCA seems to be particularly ineffective. Not only did it generally \textit{increase} the training time, but with the information loss from the excluded low-variance components it also tended to learn less, as demonstrated in Table \ref{g3}. Moreover, unless even more layers are decreased in size (i.e. the overall model is reduced in addition to using fewer PCA components), the improvement in memory usage will be marginal compared to the memory requirement for the rest of the network. 
 
-Pros. Training speed. Removing low-variance components definitely decrease memory, might have a variable effect on predictive power.
-
-Cons. More overfitting on an equivalent model. Therefore should take more care in applying better regularisation and dropout techniques. 
-
-
-
+\begin{figure}[htb!]
+	\centering
+	\includegraphics[width=\linewidth]{figures/corr.png}
+	\caption{Prediction versus actual length of next stay observations with their linear regression fit, as evaluated on the holdout test set.}\label{corr}
+\end{figure}
 
 \section{Evaluation}
-TODO Evaluate the predictive power of the best model on the holdout set.
 
+From the above model selection and hyperparameter analysis I have decided that the simplest model – the \textit{shallow} network without PCA preprocessing – is actually the most promising one, both with respect to the training time and the generalisation. I tested it on the hold-out test set to get the final Pearson's $r$ correlation of \textbf{0.138} (Figure \ref{corr}). Given that this number is quite similar to the development set figures in Table \ref{g3} and the overall predictive power being weak even on the training set, the final model was able to sustain its performance in the novel context, potentially indicating its generalisability.
 
 \medskip
  
