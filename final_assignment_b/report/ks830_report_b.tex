@@ -80,7 +80,8 @@
 \large
 Kamilė Stankevičiūtė (\texttt{ks830}) \\ Gonville \& Caius College \\[4mm]
 
-? words
+\today \\[4mm]
+1493 words
 \end{center} \vskip10mm}]
 
 
@@ -134,18 +135,18 @@ which I will use for training, but additionally taking the average (multiplying 
 
 
 \section{Feedforward neural networks}
-Ideally, I wish to be able to predict the length of the follow-on visit for a patient from as little as a single encounter rather than considering the encounter sequences: the original dataset suggests that in majority (54\%) of cases this is indeed the most information that a hospital would have for a patient. (It would also be unclear how to handle the multiple readmission anomalies for encounter sequences to be correct.)
+Ideally, I wish to be able to predict the length of the follow-on visit for a patient from as little as a single encounter rather than sequences of multiple encounters: the original dataset suggests that in majority (54\%) of cases this is indeed the most information that a hospital would have for a patient. (It is also unclear how to handle the multiple readmission anomalies, mentioned above, for the encounter sequences to be correct.)
 
 For this task I implement a set of feedforward neural networks.
 
 \subsection{Choice of architecture}
-It is tempting to assume that the deeper the neural network, the better, since with more parameters the model has a higher capacity to learn complex feature representations (although taking longer to train). 
+It is tempting to assume that the deeper the neural network, the better, since with more parameters the model has a higher capacity to learn more complex feature representations (but taking longer to train). 
 
-To test this assumption and as part of the hyperparameter selection process, I implemented three types of networks, which I will call \textit{deep}, \textit{moderate} and \textit{shallow}, containing around $6\times 10^6$, $3.5\times 10^6$ and 280,000 trainable parameters respectively. Full specification (and training results) can be found in supplementary code. 
+To test this assumption and as part of the hyperparameter selection process, I implemented three types of networks, which I will call \textit{deep}, \textit{moderate} and \textit{shallow}, containing around $6\times 10^6$, $3.5\times 10^6$ and 280,000 trainable parameters respectively. Full specification (and the training results) can be found in supplementary code. 
 
 \paragraph{Selection process} To compare their typical performance, I trained each of the networks 5 times with early stopping, measuring the average time it takes for the models to converge, and evaluating the training and development set predictions using Pearson's correlation coefficient $r$. I chose this metric as being arguably easier to interpret compared to the custom loss function.
 
-\paragraph{Vanishing gradients} During training, the networks (especially deeper ones) tended to suffer from the vanishing gradients problem, getting stuck with unlucky initialisations (about once in every five runs). Adding batch normalisation between layers and using ReLU activation function resolved this issue, albeit increasing the training times by a factor of 2 to 4 (depending on configuration). 
+\paragraph{Vanishing gradients} During training, the networks (especially deeper ones) tended to suffer from the vanishing gradients problem, getting stuck with unlucky initialisations about once in every five runs. Adding batch normalisation between layers and using ReLU activation function resolved this issue, but sacrificed the training speed. 
 
 \begin{table}[]
 	\begin{tabularx}{\linewidth}{XXXX}
@@ -160,14 +161,14 @@ To test this assumption and as part of the hyperparameter selection process, I i
 \end{table}
 
 \subsection{Results}
-The results, presented in Table \ref{g1}, seem to suggest that deeper networks are, in fact, not always better. With an almost 8-fold increase in training time and lower correlations on both training and development datasets, this particular experiment suggests that deeper networks might, contrary to the assumption, give even worse predictions than the simpler models. Moreover, since the models are trained with early stopping, the number of epochs themselves (not just the time they take) could also be used to compare the convergence speed, where the deep network required the most steps on average.
+The results, presented in Table \ref{g1}, seem to suggest that deeper networks are, in fact, not always better. With an almost 8-fold increase in training time and lower correlations on both training and development datasets, this particular experiment suggests that deeper networks might, contrary to the assumption, give even worse predictions than the simpler models. Moreover, since the models are trained with early stopping, the number of epochs themselves (not just the time they take) could also be used to compare the convergence speed. In this case the deep network required the most steps on average, indicating its slow convergence.
 
-However, it is curious that even 6 million trainable parameters are not enough to actually (over)fit the training data and give correlations closer to 1 (despite early stopping preventing the model from doing this). Whether this is a fundamental limitation of the dataset (with no useful signal for length of stay prediction), or the lack of hyperparameter optimisation would need a further investigation to determine.
+However, it is curious that even 6 million trainable parameters are not enough to actually fit the training data better and give correlations closer to 1, despite early stopping preventing the model from doing this. Determining whether this is a fundamental limitation of the dataset (with no useful signal for length of stay prediction), or the lack of hyperparameter optimisation would need further investigation that is out of this report's scope.
 
 \subsection{Using PCA features as input}
-\paragraph{Motivation} One possible way to mitigate the slow training times (especially for the \textit{deep} and \textit{moderate} models) could be the use of PCA components as input features, hopefully saving some time on learning a useful feature representation. At the same time, if PCA is capable to extract the most useful features with its first few components, it could also be used to effectively reduce the input dimensions, in turn reducing the model size and training time. 
+\paragraph{Motivation} One possible way to mitigate the slow training times (especially for the \textit{deep} and \textit{moderate} models) could be to use PCA components as input features, hopefully saving some time on learning a useful feature representation. At the same time, if PCA is capable to extract the most useful features with its first few components, it could also be used to effectively reduce the input dimensions, in turn reducing the model size and training time. 
 
-\paragraph{Experiments} I test the effectiveness of PCA on neural network training using a similar experimental set-up to the previous section, comparing the training time and development set performance on full feature representation, the PCA features of the same dimensionality and the \textit{reduced} PCA (rPCA) set which only considers the first half of the PCA components. 
+\paragraph{Experiments} I test the impact of PCA on neural network performance using a similar experimental set-up to the previous section, comparing the training time and development set predictions on the full feature representation, the PCA features of the same dimensionality and the \textit{reduced} PCA (rPCA) feature set which only considers the first half of the PCA components (with the assumption that they are the most useful).
 
 % \begin{figure*}[htb!]
 % 	\centering
@@ -200,14 +201,19 @@ However, it is curious that even 6 million trainable parameters are not enough t
 
 The training times using those techniques are shown in Table \ref{g2}. While it is possible that PCA could help with speeding up training, the improvement is not guaranteed – for the moderate network, PCA and rPCA only increased the training time. Even more importantly, PCA could not compensate for the overhead of having a bigger network: the shallow network running on the original feature set is still much faster than the deeper counterparts running on PCA features. The takeaway from this is that, for the purpose of decreasing the training time, we should worry about simplifying the network architecture first, and only then consider any fancy dimensionality reduction techniques.
 
-On the other hand, we might be interested in using PCA techniques to improve the predictive power rather than the training time, since the transformed features “should” be useful. However, while PCA-transformed features gave slightly better average development set correlations for deeper networks (Table \ref{g3}), it was not the case for the shallow network, showing once again that PCA is not a magic formula we can use for an instant performance boost.
+On the other hand, we might be interested in using PCA techniques to improve the predictive power rather than the training time, assuming the usefulness of PCA representation. However, while PCA-transformed features gave slightly better average development set correlations for deeper networks (Table \ref{g3}), it was not the case for the shallow network, showing once again that PCA is not a magic formula we can use for an instant performance or predictive power boost.
 
-rPCA seems to be particularly ineffective. Not only did it generally \textit{increase} the training time, but with the information loss from the excluded low-variance components, it also tended to learn less, as demonstrated in Table \ref{g3}. In addition, unless even more layers are decreased in size (i.e. the overall model is reduced in addition to using fewer PCA components), the improvement in memory usage is relatively low. 
+rPCA seems to be particularly ineffective. Not only did it generally \textit{increase} the training time, but with the information loss from the excluded low-variance components it also tended to learn less, as demonstrated in Table \ref{g3}. Moreover, unless even more layers are decreased in size (i.e. the overall model is reduced in addition to using fewer PCA components), the improvement in memory usage will be marginal compared to the memory requirement for the rest of the network. 
 
+\begin{figure}[htb!]
+	\centering
+	\includegraphics[width=\linewidth]{figures/corr.png}
+	\caption{Prediction versus actual length of next stay observations with their linear regression fit, as evaluated on the holdout test set.}\label{corr}
+\end{figure}
 
 \section{Evaluation}
-From the above analysis I have decided that it is the simplest model – the \textit{shallow} network without any PCA preprocessing – is actually the most promising one, both with respect to the training time and the generalisation (based on development set performance). I test it on the hold-out test set to get the correlation of ....
 
+From the above model selection and hyperparameter analysis I have decided that the simplest model – the \textit{shallow} network without PCA preprocessing – is actually the most promising one, both with respect to the training time and the generalisation. I tested it on the hold-out test set to get the final Pearson's $r$ correlation of \textbf{0.138} (Figure \ref{corr}). Given that this number is quite similar to the development set figures in Table \ref{g3} and the overall predictive power being weak even on the training set, the final model was able to sustain its performance in the novel context, potentially indicating its generalisability.
 
 \medskip
  
