@@ -152,14 +152,15 @@ To test this assumption and as part of the hyperparameter selection process, I i
 		\hline
 				& \textbf{deep} & \textbf{moderate} & \textbf{shallow}\\ \hline
 		time, s     & 276   & 84  & 35 \\
+		epochs & 13.8 & 7.4 & 9.4 \\
 		train $r$ & 0.208 & 0.376 & 0.458 \\
 		dev. $r$ & 0.127 & 0.178 & 0.207
 		\end{tabularx}
-\caption{Mean training time with mean training and development set performance of feedforward neural networks.}\label{g1}
+\caption{Mean training time, number of epochs to early stopping convergence, and training and development set performance of feedforward neural networks.}\label{g1}
 \end{table}
 
 \subsection{Results}
-The results, presented in Table \ref{g1}, seem to suggest that deeper networks are, in fact, not always better. With an almost 8-fold increase in training time and lower correlations on both training and development datasets, this particular experiment suggests that deeper networks might, contrary to the assumption, give even worse predictions than the simpler models. 
+The results, presented in Table \ref{g1}, seem to suggest that deeper networks are, in fact, not always better. With an almost 8-fold increase in training time and lower correlations on both training and development datasets, this particular experiment suggests that deeper networks might, contrary to the assumption, give even worse predictions than the simpler models. Moreover, since the models are trained with early stopping, the number of epochs themselves (not just the time they take) could also be used to compare the convergence speed, where the deep network required the most steps on average.
 
 However, it is curious that even 6 million trainable parameters are not enough to actually (over)fit the training data and give correlations closer to 1 (despite early stopping preventing the model from doing this). Whether this is a fundamental limitation of the dataset (with no useful signal for length of stay prediction), or the lack of hyperparameter optimisation would need a further investigation to determine.
 
@@ -168,12 +169,11 @@ However, it is curious that even 6 million trainable parameters are not enough t
 
 \paragraph{Experiments} I test the effectiveness of PCA on neural network training using a similar experimental set-up to the previous section, comparing the training time and development set performance on full feature representation, the PCA features of the same dimensionality and the \textit{reduced} PCA (rPCA) set which only considers the first half of the PCA components. 
 
-TODO reformat the entire thing!!!!! 
-\begin{figure*}[htb!]
-	\centering
-	\includegraphics[width=\textwidth]{figures/pc.png}
-	\caption{Impact of PCA feature sets on neural network performance.}\label{pca}
-\end{figure*}
+% \begin{figure*}[htb!]
+% 	\centering
+% 	\includegraphics[width=\textwidth]{figures/pc2.png}
+% 	\caption{Impact of PCA feature sets on neural network performance.}\label{pca}
+% \end{figure*}
 
 \paragraph{Results} 
 \begin{table}[]
@@ -187,22 +187,22 @@ TODO reformat the entire thing!!!!!
 \caption{Mean training time on raw, PCA and reduced PCA feature sets.}\label{g2}
 \end{table}
 
-% \begin{table}[]
-% 	\begin{tabularx}{\linewidth}{XXXX}
-% 		\hline
-% 				& \textbf{full} & \textbf{PCA} & \textbf{rPCA}\\ \hline
-% 		deep    & 0.127   & 0.168  & 0.116 \\
-% 		moderate  & 0.178 & 0.210 & 0.191 \\
-% 		shallow & 0.207 & 0.193 & 0.149
-% 		\end{tabularx}
-% \caption{Mean development set correlations when training on full, PCA and reduced PCA feature sets.}\label{g3}
-% \end{table}
+\begin{table}[]
+	\begin{tabularx}{\linewidth}{XXXX}
+		\hline
+				& \textbf{full} & \textbf{PCA} & \textbf{rPCA}\\ \hline
+		deep    & 0.127   & 0.168  & 0.116 \\
+		moderate  & 0.178 & 0.210 & 0.191 \\
+		shallow & 0.207 & 0.193 & 0.149
+		\end{tabularx}
+\caption{Mean development set correlations when training on full, PCA and reduced PCA feature sets.}\label{g3}
+\end{table}
 
 The training times using those techniques are shown in Table \ref{g2}. While it is possible that PCA could help with speeding up training, the improvement is not guaranteed – for the moderate network, PCA and rPCA only increased the training time. Even more importantly, PCA could not compensate for the overhead of having a bigger network: the shallow network running on the original feature set is still much faster than the deeper counterparts running on PCA features. The takeaway from this is that, for the purpose of decreasing the training time, we should worry about simplifying the network architecture first, and only then consider any fancy dimensionality reduction techniques.
 
-On the other hand, we might be interested in using PCA techniques to improve the predictive power 
+On the other hand, we might be interested in using PCA techniques to improve the predictive power rather than the training time. However, while PCA-transformed features gave slightly better development set correlations for deeper networks (Table \ref{g3}), it was not the case for the shallow network, showing once again that PCA is not a magic formula we can use for an instant performance boost.
 
-rPCA seems to be particularly ineffective. Not only did it generally \textit{increase} the training time, but with the information loss from unused low-variance components it also tended to learn less, as demonstrated in Figure \ref{pca}. In addition, unless even more layers are decreased in size (i.e. the overall model is reduced in addition to using fewer PCA components), the memory use is improved only marginally. 
+rPCA seems to be particularly ineffective. Not only did it generally \textit{increase} the training time, but with the information loss from the excluded low-variance components it also tended to learn less, as demonstrated in Table \ref{g3}. In addition, unless even more layers are decreased in size (i.e. the overall model is reduced in addition to using fewer PCA components), the improvement in memory usage is relatively low. 
 
 
 \section{Evaluation}
