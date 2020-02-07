@@ -164,10 +164,18 @@ The results, presented in Table \ref{g1}, seem to suggest that deeper networks a
 However, it is curious that even 6 million trainable parameters are not enough to actually (over)fit the training data and give correlations closer to 1 (despite early stopping preventing the model from doing this). Whether this is a fundamental limitation of the dataset (with no useful signal for length of stay prediction), or the lack of hyperparameter optimisation would need a further investigation to determine.
 
 \subsection{Using PCA features as input}
-One possible way to mitigate the slow training times (especially for the \textit{deep} and \textit{moderate} models) could be the use of PCA components as input features, hopefully saving some time on learning a useful feature representation. At the same time, if PCA is capable to extract the most useful features with its first few components, it could also be used to effectively reduce the input dimensions, in turn reducing the model size and training time. 
+\paragraph{Motivation} One possible way to mitigate the slow training times (especially for the \textit{deep} and \textit{moderate} models) could be the use of PCA components as input features, hopefully saving some time on learning a useful feature representation. At the same time, if PCA is capable to extract the most useful features with its first few components, it could also be used to effectively reduce the input dimensions, in turn reducing the model size and training time. 
 
-I test the effectiveness of PCA on training 
+\paragraph{Experiments} I test the effectiveness of PCA on neural network training using a similar experimental set-up to the previous section, comparing the training time and development set performance on full feature representation, the PCA features of the same dimensionality and the \textit{reduced} PCA (rPCA) set which only considers the first half of the PCA components. 
 
+TODO reformat the entire thing!!!!! 
+\begin{figure*}[htb!]
+	\centering
+	\includegraphics[width=\textwidth]{figures/pc.png}
+	\caption{Impact of PCA feature sets on neural network performance.}\label{pca}
+\end{figure*}
+
+\paragraph{Results} 
 \begin{table}[]
 	\begin{tabularx}{\linewidth}{XXXX}
 		\hline
@@ -176,25 +184,30 @@ I test the effectiveness of PCA on training
 		moderate  & 84 & 85 & 88 \\
 		shallow & 35 & 20 & 20
 		\end{tabularx}
-\caption{Mean training time on full, PCA and reduced PCA feature sets.}\label{g2}
+\caption{Mean training time on raw, PCA and reduced PCA feature sets.}\label{g2}
 \end{table}
 
-\begin{table}[]
-	\begin{tabularx}{\linewidth}{XXXX}
-		\hline
-				& \textbf{full} & \textbf{PCA} & \textbf{rPCA}\\ \hline
-		deep    & 0.127   & 0.168  & 0.116 \\
-		moderate  & 0.178 & 0.210 & 0.191 \\
-		shallow & 0.207 & 0.193 & 0.149
-		\end{tabularx}
-\caption{Mean development set correlations when training on full, PCA and reduced PCA feature sets.}\label{g2}
-\end{table}
+% \begin{table}[]
+% 	\begin{tabularx}{\linewidth}{XXXX}
+% 		\hline
+% 				& \textbf{full} & \textbf{PCA} & \textbf{rPCA}\\ \hline
+% 		deep    & 0.127   & 0.168  & 0.116 \\
+% 		moderate  & 0.178 & 0.210 & 0.191 \\
+% 		shallow & 0.207 & 0.193 & 0.149
+% 		\end{tabularx}
+% \caption{Mean development set correlations when training on full, PCA and reduced PCA feature sets.}\label{g3}
+% \end{table}
 
+The training times using those techniques are shown in Table \ref{g2}. While it is possible that PCA could help with speeding up training, the improvement is not guaranteed – for the moderate network, PCA and rPCA only increased the training time. Even more importantly, PCA could not compensate for the overhead of having a bigger network: the shallow network running on the original feature set is still much faster than the deeper counterparts running on PCA features. The takeaway from this is that, for the purpose of decreasing the training time, we should worry about simplifying the network architecture first, and only then consider any fancy dimensionality reduction techniques.
+
+
+
+rPCA seems to be particularly ineffective. Not only did it generally \textit{increase} the training time, but with the information loss from unused low-variance components it also tended to learn less, which could be seen from the points for rPCA in Figure \ref{pca} being below the others.
 
 
 
 \section{Evaluation}
-
+The analysis above has shown that the 
 
 
 \medskip
