@@ -200,10 +200,9 @@ TODO reformat the entire thing!!!!!
 
 The training times using those techniques are shown in Table \ref{g2}. While it is possible that PCA could help with speeding up training, the improvement is not guaranteed – for the moderate network, PCA and rPCA only increased the training time. Even more importantly, PCA could not compensate for the overhead of having a bigger network: the shallow network running on the original feature set is still much faster than the deeper counterparts running on PCA features. The takeaway from this is that, for the purpose of decreasing the training time, we should worry about simplifying the network architecture first, and only then consider any fancy dimensionality reduction techniques.
 
+On the other hand, we might be interested in using PCA techniques to improve the predictive power 
 
-
-rPCA seems to be particularly ineffective. Not only did it generally \textit{increase} the training time, but with the information loss from unused low-variance components it also tended to learn less, which could be seen from the points for rPCA in Figure \ref{pca} being below the others.
-
+rPCA seems to be particularly ineffective. Not only did it generally \textit{increase} the training time, but with the information loss from unused low-variance components it also tended to learn less, as demonstrated in Figure \ref{pca}. In addition, unless even more layers are decreased in size (i.e. the overall model is reduced in addition to using fewer PCA components), the memory use is improved only marginally. 
 
 
 \section{Evaluation}
