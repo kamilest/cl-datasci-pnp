@@ -92,36 +92,33 @@ I use the raw data (\textit{diabetic\_data\_original.csv}) of the same medical c
 The preprocessing steps below resulted in 16515 training instances.
 
 \paragraph{Filtering}
-Due to the nature of the prediction task, only the patients with at least two recorded encounters were considered – the later encounter is used to generate the label for the earlier one, and the last encounter does not have a known label. 
+Only the patients with at least two recorded encounters were considered, since the later encounter is required to generate the label for the earlier one. To ensure independence of all examples in the dataset (corresponding to the assumptions of the probabilistic model described below), only one randomly sampled example per patient was used.
 
 \paragraph{Multiple readmission} Taking a closer look at the dataset has shown that some patients have recorded follow-on visits even in cases when the readmission outcome was `NO' (for example, at least 44 patients have been \textit{not readmitted more than once}). Further investigation would be necessary to determine the reason for this (e.g. human error, admission to another hospital,...) in order to handle it correctly. I decided to not sample from any no-readmission encounters (of which after initial filtering there were 490).
 
-\paragraph{Multiple examples} To ensure independence of all examples in the dataset (corresponding to the assumptions of the probabilistic model described below), I only used a single randomly sampled example per patient (with the constraints described above). 
-
 \subsection{Feature preprocessing}
 
-The main advantage of using the deep learning tools is their capacity to select the most useful features without any manual feature preprocessing by a data engineer. For this reason, the models will be trained in an end-to-end manner on all features, but with the following considerations.
+The main advantage of using the deep learning tools is their capacity to select the most useful features without manual feature engineering by the analyst. For this reason, the models will be trained in an end-to-end manner on all features, but with the following considerations.
 
 \paragraph{Anonymisation} As before, the encounter and patient numbers were removed at training stage.
 
 \paragraph{Missing values} In the full dataset, the \textit{weight} feature was missing in 98.6\% of instances, so I excluded it from training. For other features, the missing values were imputed using median or constant strategy for numerical and categorical features respectively.
 
-\paragraph{Numerical and categorical features} Similar to processing in Assignment A: the features were converted to numerical or categorical values based on their meaning, and further normalised/one-hot encoded for performance reasons. To avoid a large number of features with small number of examples, the diagnoses were first compressed to broader categories (e.g. circulatory, respiratory, etc.)
+\paragraph{Numerical and categorical features} As before, the features were converted to numerical or categorical values based on their meaning, and further normalised/one-hot encoded for performance reasons. To avoid a large number of sparse features, the diagnoses were compressed to broader categories (e.g. circulatory, respiratory, etc.)
 
 
 \section{Machine learning set-up}
 
 \subsection{Train and test set split}
-With a view to get a more generalisable model, I split the data into qualitatively different sets using a single-component t-SNE projection (at perplexity 30), holding out the top 10\% of values for testing, and another 10\% for validation.
+With a view to get a more generalisable model, I split the data into qualitatively different sets using a single-component t-SNE projection (perplexity=30), holding out the top 10\% of values for testing, and another 10\% for validation.
 
 \subsection{Probabilistic model}
-
-I model the predicted variable (length of next stay) using \textit{zero-truncated Poisson distribution} (ZTP). I truncated the zero because, if the follow-on visit happens, the length of stay must be at least 1, violating the assumptions of the regular Poisson distribution where observations of 0 are possible (on the other hand, I still allow predictions of more than 14 days that were not observed in the dataset but in theory should be possible). The observations $y_i \in \mathbb{N}^+$ therefore follow \[Y_i \sim \mathrm{ZTP}(f_\theta(x_i))\]
+I model length of next stay using \textit{zero-truncated Poisson distribution} (ZTP). I truncated the zero because, if the follow-on visit happens, the length of stay must be at least 1, violating the assumptions of the regular Poisson distribution where observations of 0 are possible (on the other hand, I still allow predictions of more than 14 days that were not observed in the dataset but in theory should be possible). The observations $y_i \in \mathbb{N}^+$ therefore follow \[Y_i \sim \mathrm{ZTP}(f_\theta(x_i))\]
 
 with probability mass function 
 
 \begin{equation}
-	\mathbb{P}[Y_i = y_i] = \frac{f_\theta(x_i)^{y_i}}{(e^{f_\theta(x_i)} - 1)y_i!}.
+	\mathbb{P}[Y_i = y_i | \theta, x_i] = \frac{f_\theta(x_i)^{y_i}}{(e^{f_\theta(x_i)} - 1)y_i!}.
 	\label{eq1}
 \end{equation}
 
@@ -137,14 +134,14 @@ which I will use for training, but additionally taking the average (multiplying 
 
 
 \section{Feedforward neural networks}
-Ideally, I wish to be able to predict the length of the follow-on visit for a patient from as little as a single encounter – the original dataset suggests that in majority (54\%) of cases this is indeed the most information that a hospital would have for a patient. For this task I implement a set of \textit{feedforward neural networks}.
+Ideally, I wish to be able to predict the length of the follow-on visit for a patient from as little as a single encounter rather than considering the encounter sequences: the original dataset suggests that in majority (54\%) of cases this is indeed the most information that a hospital would have for a patient. (It would also be unclear how to handle the multiple readmission anomalies for encounter sequences to be correct).
+
+For this task I implement a set of \textit{feedforward neural networks}.
 
 \subsection{Choice of architecture}
 Tempting to assume that the deeper the better – increased number of parameters should improve the predictive power of the neural networks.
 
-At the same time, if there is a simple model that is faster to train yet retains the same predictive power, there is no point in using the less efficient model. 
-
-\paragraph{Architecture description} Some initial architecture exploration has shown, as expected, that deeper and wider architectures tend to be more effective at this learning task but take longer to train (without much improvement in results). I settled in between those two constraints, implementing a network with 8 hidden layers of up to 1024 units, the ReLU activation function, and Adam optimiser with early stopping. 
+At the same time, if there is a simple model that is faster to train yet retains the same predictive power, there is no point in using the less efficient model.
 
 
 % You could just about squeeze in something, but it's not worth it --
@@ -152,28 +149,24 @@ At the same time, if there is a simple model that is faster to train yet retains
 % network, and how does its design affect what it learns?"
 
 
-\section{Results}
+\subsection{Results}
 TODO table and comparison of results, insights on which model is the best
 
-TODO was regularisation and dropout effective
-
-Deeper networks additionally seem to suffer more from the \textit{vanishing gradient} problem, depending on the initialisation of the weights, and despite using the ReLU activation function that is commonly used to solve this problem.
-
-I have added batch normalisation between each layer, which made the outliers less common but did not completely resolve the issue. It also slowed the convergence: for the deep model, convergence took 4 times longer on average.
+Deeper networks tended to suffer from the \textit{vanishing gradient} problem, getting stuck with unlucky initialisation (about 20\% of the time). Adding batch normalisation between layers and using ReLU activation function resolved the issue.
 
 
 \paragraph{Interpretation}
 Medical emergencies are unpredictable in nature. 
 
 
-\subsection{Impact of PCA on training performance}
+\subsection{Impact of PCA on learning effectiveness}
 
 Does it speed training? \textbf{Why?}
 
 Pros. Training speed. Removing low-variance components definitely decrease memory, might have a variable effect on predictive power.
 
 Cons. More overfitting on an equivalent model. Therefore should take more care in applying better regularisation and dropout techniques. 
-
+\paragraph{Interpretation}
 
 \section{Evaluation}
 TODO Evaluate the predictive power of the best model on the holdout set.
