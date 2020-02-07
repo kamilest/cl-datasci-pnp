@@ -3,6 +3,7 @@ final_assignment/training/diabetes
 final_assignment_2018
 *.pdf
 *.png
+*.npy
 
 getting-started.ipynb
 
