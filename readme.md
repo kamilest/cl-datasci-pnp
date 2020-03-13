@@ -4,4 +4,3 @@ Course materials for the Data Science: Principles and Practice course at the Uni
 * Course homepage: https://www.cl.cam.ac.uk/teaching/1920/DataSciII/
 * Github repository: https://github.com/ekochmar/cl-datasci-pnp
 
-Copyright (c) 2020 Kamilė Stankevičiūtė.
